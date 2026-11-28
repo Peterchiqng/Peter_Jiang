@@ -84,9 +84,9 @@ nav.jump{top:58px !important}
   <div class="head">
     <div>
       <h1><span class="gtext">S&amp;P 500</span> 預估估值儀表板</h1>
-      <p class="sub">Forward PE (NTM) · 預估EPS · 實際EPS ｜ 1年 / 2年 / 3年 / 5年 / 10年 標準差帶分析</p>
+      <p class="sub">預估本益比（未來 12 個月）· 預估EPS · 近四季本益比 ｜ 1年 / 2年 / 3年 / 5年 / 10年 標準差帶分析</p>
     </div>
-    <span class="stamp">資料快照 2026/05 · FactSet / First Trust / MacroMicro</span>
+    <span class="stamp"><span id="stampTxt">載入中…</span></span>
   </div>
 
   <div class="tabs" id="metricTabs"></div>
@@ -100,7 +100,7 @@ nav.jump{top:58px !important}
   </section>
 
   <section class="panel">
-    <h2>預估本益比 vs 預估EPS 走勢對比 <small id="dualSub"></small></h2>
+    <h2>預估本益比 vs 預估EPS <small id="dualSub"></small></h2>
     <div class="cv sm"><canvas id="cDual"></canvas></div>
   </section>
 
@@ -112,7 +112,7 @@ nav.jump{top:58px !important}
   <section class="panel">
     <h2>關鍵洞察 <small>由頁面內的資料自動計算</small></h2>
     <div class="insights" id="ins"></div>
-    <p class="note">資料說明：Forward PE = NTM 共識本益比（年底值），來源 FactSet / Yardeni / IBES；Forward EPS = NTM 共識 EPS（年底值）；Actual EPS = 年度實際 EPS（First Trust / Capital IQ / S&amp;P Global，2025 年 $273、2026E $319、2027E $373）。2012–2025 年底值為彙整的近似值，2026 年為 2026/05 的快照。本頁僅供資訊參考，不構成投資建議。</p>
+    <p class="note" id="srcNote"></p>
   </section>
 </main>
 <footer>© 投資儀表板 · 三個頁面：S&amp;P 500 預估估值、台股大盤本益比、個股儀表板</footer>
@@ -121,46 +121,18 @@ nav.jump{top:58px !important}
 <script>
 (function () {
   'use strict';
-
-  /* ===== 資料：年底 NTM Forward PE / Forward EPS / 實際EPS ===== */
-  var DATA = [
-    { year: 2012, fwdPE: 12.7, fwdEPS: 111, actualEPS: 104 },
-    { year: 2013, fwdPE: 15.4, fwdEPS: 121, actualEPS: 109 },
-    { year: 2014, fwdPE: 16.3, fwdEPS: 125, actualEPS: 117 },
-    { year: 2015, fwdPE: 16.1, fwdEPS: 125, actualEPS: 117 },
-    { year: 2016, fwdPE: 17.1, fwdEPS: 131, actualEPS: 117 },
-    { year: 2017, fwdPE: 18.6, fwdEPS: 148, actualEPS: 130 },
-    { year: 2018, fwdPE: 14.2, fwdEPS: 176, actualEPS: 160 },
-    { year: 2019, fwdPE: 18.6, fwdEPS: 176, actualEPS: 162 },
-    { year: 2020, fwdPE: 22.3, fwdEPS: 168, actualEPS: 138 },
-    { year: 2021, fwdPE: 21.5, fwdEPS: 222, actualEPS: 207 },
-    { year: 2022, fwdPE: 16.5, fwdEPS: 232, actualEPS: 218 },
-    { year: 2023, fwdPE: 19.5, fwdEPS: 244, actualEPS: 219 },
-    { year: 2024, fwdPE: 21.7, fwdEPS: 271, actualEPS: 243 },
-    { year: 2025, fwdPE: 22.5, fwdEPS: 282, actualEPS: 273 },
-    { year: 2026, fwdPE: 20.9, fwdEPS: 319, actualEPS: null, cur: true }
-  ];
-  var CUR = DATA[DATA.length - 1];
-
-  var PERIODS = [
-    { key: '1y', label: '1年', start: 2025, color: '#7C6BD6' },
-    { key: '2y', label: '2年', start: 2024, color: '#6366f1' },
-    { key: '3y', label: '3年', start: 2023, color: '#2A82B8' },
-    { key: '5y', label: '5年', start: 2021, color: '#12A06A' },
-    { key: '10y', label: '10年', start: 2016, color: '#F5852F' }
-  ];
+  var PERIODS = [{ key: '1y', n: 1, label: '1年', c: '#7C6BD6' }, { key: '2y', n: 2, label: '2年', c: '#3B6FD9' }, { key: '3y', n: 3, label: '3年', c: '#2A82B8' }, { key: '5y', n: 5, label: '5年', c: '#12A06A' }, { key: '10y', n: 10, label: '10年', c: '#F5852F' }];
   var METRICS = [
-    { key: 'fwdPE', label: '預估本益比 (Forward PE)', unit: 'x', color: '#2A82B8', desc: 'NTM共識本益比 · 年底值' },
-    { key: 'fwdEPS', label: '預估EPS (Forward EPS)', unit: '$', color: '#12A06A', desc: 'NTM共識EPS · 年底值' },
-    { key: 'actualEPS', label: '實際EPS (Actual EPS)', unit: '$', color: '#F5852F', desc: '年度實際EPS' }
+    { key: 'fpe', label: '預估本益比（未來12個月）', unit: 'x', color: '#2A82B8', desc: 'WSJ / Birinyi 共識 · 觀測值' },
+    { key: 'feps', label: '預估EPS（未來12個月）', unit: '$', color: '#12A06A', desc: '= 指數 ÷ 預估本益比' },
+    { key: 'tpe', label: '近四季本益比', unit: 'x', color: '#F5852F', desc: 'WSJ 公布之 trailing PE' }
   ];
-  var state = { metric: 'fwdPE', period: '5y' };
+  var state = { metric: 'fpe', period: '5y' };
+  var R = [], META = {};
 
-  /* ===== 工具 ===== */
   function $(s) { return document.querySelector(s); }
   function stats(a) {
-    var n = a.length;
-    if (!n) return { mean: 0, std: 0, n: 0 };
+    var n = a.length; if (!n) return { mean: 0, std: 0, n: 0 };
     var m = a.reduce(function (s, v) { return s + v; }, 0) / n;
     var sd = Math.sqrt(a.reduce(function (s, v) { return s + (v - m) * (v - m); }, 0) / Math.max(n - 1, 1));
     return { mean: m, std: sd, n: n };
@@ -169,163 +141,103 @@ nav.jump{top:58px !important}
   function fv(m, v) { if (v == null || isNaN(v)) return '–'; return m.unit === '$' ? '$' + v.toFixed(1) : v.toFixed(2) + 'x'; }
   function sgn(z) { return (z > 0 ? '+' : '') + z.toFixed(2) + 'σ'; }
   function pct(a, b) { var d = (a / b - 1) * 100; return (d > 0 ? '+' : '') + d.toFixed(1) + '%'; }
-  function zOf(cur, s) { return cur != null && s.n > 1 && s.std > 0 ? (cur - s.mean) / s.std : null; }
   function qual(z) { if (z == null) return '–'; var a = Math.abs(z); return a >= 2 ? (z > 0 ? '顯著高估' : '顯著低估') : a >= 1 ? (z > 0 ? '偏高' : '偏低') : '接近均值'; }
-
+  function addYears(ds, n) { var d = new Date(ds + 'T00:00:00'); d.setFullYear(d.getFullYear() - n); return d.toISOString().slice(0, 10); }
   var charts = {};
-  function mk(id, cfg) {
-    if (typeof Chart === 'undefined') return;
-    if (charts[id]) charts[id].destroy();
-    charts[id] = new Chart(document.getElementById(id), cfg);
-  }
+  function mk(id, cfg) { if (typeof Chart === 'undefined') return; if (charts[id]) charts[id].destroy(); charts[id] = new Chart(document.getElementById(id), cfg); }
   function opts(extra) {
-    var o = {
-      responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+    var o = { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
       plugins: { legend: { labels: { color: '#36536B', boxWidth: 12, font: { size: 11 } } } },
-      scales: {
-        x: { ticks: { color: '#6A8399', font: { size: 11 } }, grid: { display: false } },
-        y: { ticks: { color: '#6A8399', font: { size: 10 } }, grid: { color: '#E1ECF4' } }
-      }
-    };
-    if (extra) {
-      if (extra.plugins) { Object.keys(extra.plugins).forEach(function (k) { o.plugins[k] = extra.plugins[k]; }); }
-      if (extra.scales) { Object.keys(extra.scales).forEach(function (k) { o.scales[k] = extra.scales[k]; }); }
-    }
+      scales: { x: { ticks: { color: '#6A8399', font: { size: 10 }, maxTicksLimit: 12 }, grid: { display: false } }, y: { ticks: { color: '#6A8399', font: { size: 10 } }, grid: { color: '#E1ECF4' } } } };
+    if (extra) { if (extra.plugins) Object.keys(extra.plugins).forEach(function (k) { o.plugins[k] = extra.plugins[k]; }); if (extra.scales) Object.keys(extra.scales).forEach(function (k) { o.scales[k] = extra.scales[k]; }); }
     return o;
   }
 
-  /* ===== 繪製 ===== */
-  function renderTabs() {
-    $('#metricTabs').innerHTML = METRICS.map(function (m) {
-      var on = m.key === state.metric;
-      return '<button type="button" class="tab" data-k="metric:' + m.key + '" style="' + (on ? 'color:' + m.color + ';border-color:' + m.color + ';background:' + m.color + '22' : '') + '">' + m.label + '</button>';
-    }).join('');
-    $('#periodTabs').innerHTML = PERIODS.map(function (p) {
-      var on = p.key === state.period;
-      return '<button type="button" class="tab" data-k="period:' + p.key + '" style="' + (on ? 'color:' + p.color + ';border-color:' + p.color + ';background:' + p.color + '22' : '') + '">近' + p.label + '</button>';
-    }).join('');
+  function tryFetch(u) { return fetch(u, { cache: 'no-cache' }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }); }
+  function load() {
+    return tryFetch('market/data/market.json').then(function (d) { return { t: d.idx.SPX, upd: d.updated, src: 'market/data/market.json' }; })
+      .catch(function () { return tryFetch('data/spx.json').then(function (d) { return { t: d, upd: d.updated, src: 'data/spx.json' }; }); });
   }
+  function build(res) {
+    var fw = res.t.fw;
+    R = fw.d.map(function (d, i) { return { d: d, px: fw.px[i], fpe: fw.fpe[i], feps: fw.feps[i], tpe: fw.tpe[i] }; });
+    META = { upd: res.upd, src: res.src, n: R.length, first: R[0].d, last: R[R.length - 1].d };
+    $('#stampTxt').textContent = '更新 ' + (META.upd || '') + ' · 最新觀測 ' + META.last + ' · WSJ';
+    $('#srcNote').innerHTML = '資料說明：預估本益比（未來 12 個月）與近四季本益比來自 WSJ「P/Es &amp; Yields on Major Indexes」（預估由 Birinyi Associates 提供，為營業盈餘）；2013 年起的歷史由 Wayback Machine 的每月快照回補，共 ' + META.n + ' 個觀測點，間隔不一定相等（約每 1–2 個月一筆），標準差即以這些觀測值計算。預估EPS = 指數收盤 ÷ 預估本益比。數值與 FactSet 週報（約 12 個月預估 EPS、5 年／10 年均值）不完全相同，因為盈餘定義與預估期間不同。資料由 GitHub Actions 每個交易日自動更新（來源檔 ' + META.src + '）。本頁僅供資訊參考，不構成投資建議。';
+  }
+
+  function renderTabs() {
+    $('#metricTabs').innerHTML = METRICS.map(function (m) { var on = m.key === state.metric; return '<button type="button" class="tab' + (on ? ' on' : '') + '" data-k="metric:' + m.key + '">' + m.label + '</button>'; }).join('');
+    $('#periodTabs').innerHTML = PERIODS.map(function (p) { var on = p.key === state.period; return '<button type="button" class="tab' + (on ? ' on' : '') + '" data-k="period:' + p.key + '">近' + p.label + '</button>'; }).join('');
+  }
+  function rowsFor(p) { var cut = addYears(META.last, p.n); return R.filter(function (d) { return d.d >= cut; }); }
+  function histStats(m, p) { var rows = rowsFor(p); return stats(rows.slice(0, -1).map(function (d) { return d[m.key]; })); }
 
   function render() {
     renderTabs();
     var m = METRICS.filter(function (x) { return x.key === state.metric; })[0];
     var p = PERIODS.filter(function (x) { return x.key === state.period; })[0];
-    var rows = DATA.filter(function (d) { return d.year >= p.start; });
-    var vals = rows.filter(function (d) { return d[m.key] != null; }).map(function (d) { return d[m.key]; });
-    var st = stats(vals);
-    var cur = CUR[m.key];
-    var z = zOf(cur, st);
-
-    $('#warn').textContent = st.n < 5 ? '提醒：近' + p.label + '只有 ' + st.n + ' 筆樣本，標準差與 Z-score 的參考性有限，建議搭配 5 年、10 年一起看。' : '';
-
-    var cards = [
-      { l: '當前值', v: fv(m, cur), s: '2026/05 快照', c: m.color },
-      { l: p.label + '均值', v: st.n ? fv(m, st.mean) : '–', s: 'n=' + st.n, c: p.color },
+    var rows = rowsFor(p), cur = R[R.length - 1][m.key];
+    var st = stats(rows.map(function (d) { return d[m.key]; }));
+    var z = st.std > 0 ? (cur - st.mean) / st.std : null;
+    $('#warn').textContent = st.n < 8 ? '提醒：近' + p.label + '只有 ' + st.n + ' 個觀測值，標準差與 Z-score 的參考性有限。' : '';
+    $('#cards').innerHTML = [
+      { l: '最新值', v: fv(m, cur), s: META.last, c: m.color },
+      { l: p.label + '均值', v: fv(m, st.mean), s: 'n=' + st.n, c: p.c },
       { l: p.label + '標準差', v: st.n > 1 ? fv(m, st.std) : '–', s: '1σ', c: '#36536B' },
-      { l: 'Z-score', v: z != null ? sgn(z) : '–', s: z == null ? '' : (Math.abs(z) >= 2 ? '顯著偏高/低' : Math.abs(z) >= 1 ? '偏高/偏低' : '接近均值'), c: z != null ? zColor(z) : '#6A8399' },
-      { l: '+2σ 上界', v: st.n > 1 ? fv(m, st.mean + 2 * st.std) : '–', s: '過熱警戒', c: '#E5484D' },
-      { l: '-1σ 下界', v: st.n > 1 ? fv(m, st.mean - st.std) : '–', s: '均值支撐', c: '#12A06A' }
-    ];
-    $('#cards').innerHTML = cards.map(function (c) {
-      return '<div class="card"><div class="l">' + c.l + '</div><div class="v" style="color:' + c.c + '">' + c.v + '</div><div class="s">' + c.s + '</div></div>';
-    }).join('');
+      { l: 'Z-score', v: z != null ? sgn(z) : '–', s: qual(z), c: z != null ? zColor(z) : '#6A8399' },
+      { l: '+2σ 上界', v: fv(m, st.mean + 2 * st.std), s: '過熱警戒', c: '#E5484D' },
+      { l: '-1σ 下界', v: fv(m, st.mean - st.std), s: '均值支撐', c: '#12A06A' }
+    ].map(function (c) { return '<div class="card"><div class="l">' + c.l + '</div><div class="v" style="color:' + c.c + '">' + c.v + '</div><div class="s">' + c.s + '</div></div>'; }).join('');
 
-    /* 主圖 */
-    $('#mainTitle').innerHTML = m.label + ' · 近' + p.label + '　均值 <span style="color:' + p.color + '">' + fv(m, st.mean) + '</span>　σ ' + (st.n > 1 ? fv(m, st.std) : '–') + ' <small>' + m.desc + '</small>';
-    function cl(label, v, col, dash) {
-      return { label: label + ' ' + fv(m, v), data: rows.map(function () { return +v.toFixed(3); }), borderColor: col, borderWidth: 1, borderDash: dash || [5, 4], pointRadius: 0, fill: false };
-    }
-    var ds = [{
-      label: m.label, data: rows.map(function (d) { return d[m.key]; }), borderColor: m.color, borderWidth: 2.2, tension: 0.25,
-      fill: true, backgroundColor: m.color + '22',
-      pointRadius: rows.map(function (d) { return d.cur ? 6 : 3; }),
-      pointBackgroundColor: rows.map(function (d) { return d.cur ? '#F5852F' : m.color; })
-    }];
-    if (st.n >= 2) {
-      ds.push(cl('均值', st.mean, p.color, []));
-      ds.push(cl('+1σ', st.mean + st.std, '#C99700'));
-      ds.push(cl('-1σ', st.mean - st.std, '#C99700'));
-      ds.push(cl('+2σ', st.mean + 2 * st.std, '#E5484D'));
-      ds.push(cl('-2σ', st.mean - 2 * st.std, '#E5484D'));
-    }
-    mk('cMain', {
-      type: 'line',
-      data: { labels: rows.map(function (d) { return d.year + (d.cur ? ' (估)' : ''); }), datasets: ds },
-      options: opts({ plugins: { tooltip: { filter: function (it) { return it.datasetIndex === 0; } } } })
-    });
+    $('#mainTitle').innerHTML = m.label + ' · 近' + p.label + '　均值 <span style="color:' + p.c + '">' + fv(m, st.mean) + '</span>　σ ' + fv(m, st.std) + ' <small>' + m.desc + '</small>';
+    var labels = rows.map(function (d) { return d.d; });
+    function cl(label, v, col, dash) { return { label: label + ' ' + fv(m, v), data: rows.map(function () { return +v.toFixed(3); }), borderColor: col, borderWidth: 1, borderDash: dash || [5, 4], pointRadius: 0, fill: false }; }
+    var ds = [{ label: m.label, data: rows.map(function (d) { return d[m.key]; }), borderColor: m.color, borderWidth: 2.2, tension: 0.2, fill: true, backgroundColor: m.color + '1F',
+      pointRadius: rows.map(function (d, i) { return i === rows.length - 1 ? 6 : (rows.length > 40 ? 0 : 3); }), pointBackgroundColor: rows.map(function (d, i) { return i === rows.length - 1 ? '#F5852F' : m.color; }) }];
+    if (st.n >= 2) { ds.push(cl('均值', st.mean, p.c, [])); ds.push(cl('+1σ', st.mean + st.std, '#C99700')); ds.push(cl('-1σ', st.mean - st.std, '#C99700')); ds.push(cl('+2σ', st.mean + 2 * st.std, '#E5484D')); ds.push(cl('-2σ', st.mean - 2 * st.std, '#E5484D')); }
+    mk('cMain', { type: 'line', data: { labels: labels, datasets: ds }, options: opts({ plugins: { tooltip: { filter: function (it) { return it.datasetIndex === 0; } } } }) });
 
-    /* 對比圖 */
     $('#dualSub').textContent = '近' + p.label;
-    mk('cDual', {
-      data: {
-        labels: rows.map(function (d) { return d.year + (d.cur ? ' (估)' : ''); }),
-        datasets: [
-          { type: 'line', label: '預估本益比 (左軸)', data: rows.map(function (d) { return d.fwdPE; }), borderColor: '#2A82B8', borderWidth: 2.5, pointRadius: 3, tension: 0.2, yAxisID: 'y', order: 0 },
-          { type: 'bar', label: '預估EPS (右軸)', data: rows.map(function (d) { return d.fwdEPS; }), backgroundColor: 'rgba(163,230,53,.25)', borderColor: '#12A06A', borderWidth: 1, yAxisID: 'y1', order: 2 },
-          { type: 'line', label: '實際EPS (右軸)', data: rows.map(function (d) { return d.actualEPS; }), borderColor: '#F5852F', borderWidth: 1.8, borderDash: [6, 3], pointRadius: 2.5, yAxisID: 'y1', order: 1 }
-        ]
-      },
-      options: opts({
-        scales: {
-          y: { position: 'left', suggestedMin: 8, ticks: { color: '#2A82B8', font: { size: 10 }, callback: function (v) { return v + 'x'; } }, grid: { color: '#E1ECF4' } },
-          y1: { position: 'right', beginAtZero: true, ticks: { color: '#12A06A', font: { size: 10 }, callback: function (v) { return '$' + v; } }, grid: { display: false } }
-        }
-      })
-    });
+    mk('cDual', { data: { labels: labels, datasets: [
+      { type: 'line', label: '預估本益比 (左軸)', data: rows.map(function (d) { return d.fpe; }), borderColor: '#2A82B8', borderWidth: 2.2, pointRadius: 0, tension: 0.2, yAxisID: 'y', order: 0 },
+      { type: 'line', label: '近四季本益比 (左軸)', data: rows.map(function (d) { return d.tpe; }), borderColor: '#F5852F', borderWidth: 1.6, borderDash: [6, 3], pointRadius: 0, tension: 0.2, yAxisID: 'y', order: 1 },
+      { type: 'bar', label: '預估EPS (右軸)', data: rows.map(function (d) { return d.feps; }), backgroundColor: 'rgba(18,160,106,.22)', borderColor: '#12A06A', borderWidth: 1, yAxisID: 'y1', order: 2 }] },
+      options: opts({ scales: { y: { position: 'left', ticks: { color: '#2A82B8', font: { size: 10 }, callback: function (v) { return v + 'x'; } }, grid: { color: '#E1ECF4' } }, y1: { position: 'right', beginAtZero: true, ticks: { color: '#12A06A', font: { size: 10 }, callback: function (v) { return '$' + v; } }, grid: { display: false } } } }) });
 
-    /* 統計表 */
-    $('#tblTitle').innerHTML = m.label + ' — 五段時間統計 <small>當前值 ' + fv(m, cur) + '</small>';
-    var sr = PERIODS.map(function (pp) {
-      var s = stats(DATA.filter(function (d) { return d.year >= pp.start && d[m.key] != null; }).map(function (d) { return d[m.key]; }));
-      return { p: pp, s: s, z: zOf(cur, s) };
-    });
-    var h = '<tr><th>時間段</th><th>n</th><th>均值</th><th>σ</th><th>-2σ</th><th>-1σ</th><th>均值</th><th>+1σ</th><th>+2σ</th><th>Z-score</th><th>定性</th></tr>';
-    h += sr.map(function (r) {
-      var mid = r.s.n > 1;
-      var cells = [-2, -1, 0, 1, 2].map(function (k) { return '<td>' + (mid ? fv(m, r.s.mean + k * r.s.std) : '–') + '</td>'; }).join('');
-      var zc = r.z != null ? zColor(r.z) : '#6A8399';
-      return '<tr style="' + (r.p.key === state.period ? 'background:' + r.p.color + '14' : '') + '"><td style="color:' + r.p.color + ';font-weight:600">近' + r.p.label + '</td><td>' + r.s.n + '</td><td style="color:' + r.p.color + '">' + fv(m, r.s.mean) + '</td><td>' + (mid ? fv(m, r.s.std) : '–') + '</td>' +
-        cells + '<td style="color:' + zc + ';font-weight:700">' + (r.z != null ? sgn(r.z) : '–') + '</td><td style="color:' + zc + '">' + qual(r.z) + '</td></tr>';
+    $('#tblTitle').innerHTML = m.label + ' — 五段時間統計 <small>最新值 ' + fv(m, cur) + '</small>';
+    var h = '<tr><th>時間段</th><th>n</th><th>均值</th><th>σ</th><th>-2σ</th><th>-1σ</th><th>+1σ</th><th>+2σ</th><th>Z-score</th><th>定性</th></tr>';
+    h += PERIODS.map(function (pp) {
+      var s = stats(rowsFor(pp).map(function (d) { return d[m.key]; })), zz = s.std > 0 ? (cur - s.mean) / s.std : null, ok = s.n > 1;
+      var cells = [-2, -1, 1, 2].map(function (k) { return '<td>' + (ok ? fv(m, s.mean + k * s.std) : '–') + '</td>'; }).join('');
+      return '<tr style="' + (pp.key === state.period ? 'background:' + pp.c + '14' : '') + '"><td style="color:' + pp.c + ';font-weight:700">近' + pp.label + '</td><td>' + s.n + '</td><td style="color:' + pp.c + '">' + fv(m, s.mean) + '</td><td>' + (ok ? fv(m, s.std) : '–') + '</td>' + cells +
+        '<td style="color:' + (zz != null ? zColor(zz) : '#6A8399') + ';font-weight:800">' + (zz != null ? sgn(zz) : '–') + '</td><td style="color:' + (zz != null ? zColor(zz) : '#6A8399') + '">' + qual(zz) + '</td></tr>';
     }).join('');
     $('#tbl').innerHTML = h;
-
     renderInsights();
   }
 
+  function nearest(date) { var best = R[0]; R.forEach(function (d) { if (d.d <= date) best = d; }); return best; }
   function renderInsights() {
-    function pe(start) { return stats(DATA.filter(function (d) { return d.year >= start; }).map(function (d) { return d.fwdPE; })); }
-    var s5 = pe(2021), s10 = pe(2016);
-    var z5 = (CUR.fwdPE - s5.mean) / s5.std, z10 = (CUR.fwdPE - s10.mean) / s10.std;
-    function by(y) { return DATA.filter(function (d) { return d.year === y; })[0]; }
-    var d24 = by(2024), d25 = by(2025);
+    var c = R[R.length - 1], m = METRICS[0];
+    var s5 = histStats(m, PERIODS[3]), s10 = histStats(m, PERIODS[4]);
+    var z5 = (c.fpe - s5.mean) / s5.std, z10 = (c.fpe - s10.mean) / s10.std;
+    var y1 = nearest(addYears(c.d, 1));
+    var mx = R.reduce(function (a, d) { return d.fpe > a.fpe ? d : a; }, R[0]), mn = R.reduce(function (a, d) { return d.fpe < a.fpe ? d : a; }, R[0]);
     var cards = [
-      { c: '#2A82B8', t: '估值位置',
-        b: '當前預估本益比 ' + CUR.fwdPE + 'x；近5年均值 ' + s5.mean.toFixed(1) + 'x（' + sgn(z5) + '）、近10年均值 ' + s10.mean.toFixed(1) + 'x（' + sgn(z10) + '）。FactSet 公布的 5年／10年均值約為 19.9x／18.9x。' },
-      { c: '#12A06A', t: 'EPS 成長',
-        b: '2025 年實際 EPS $' + d25.actualEPS + '（較 2024 年 ' + pct(d25.actualEPS, d24.actualEPS) + '），2026E 預估 $' + CUR.fwdEPS + '（較 2025 年實際 ' + pct(CUR.fwdEPS, d25.actualEPS) + '）。預估值能否兌現是估值是否合理的關鍵。' },
-      { c: '#F5852F', t: '本益比壓縮 vs EPS 擴張',
-        b: 'Forward PE 由 2025 年的 ' + d25.fwdPE + 'x 降到 ' + CUR.fwdPE + 'x（' + pct(CUR.fwdPE, d25.fwdPE) + '），同期預估 EPS 由 $' + d25.fwdEPS + ' 升到 $' + CUR.fwdEPS + '（' + pct(CUR.fwdEPS, d25.fwdEPS) + '），代表近期股價漲幅沒有超過盈餘預估的上修速度。' },
-      { c: '#D9487F', t: '歷史比較基準',
-        b: 'MacroMicro 的 25 年均值為 16.75x（±1σ：13.45 ~ 20.04x）。當前 ' + CUR.fwdPE + 'x ' + (CUR.fwdPE > 20.04 ? '略高於' : '未超過') + ' +1σ（20.04x），反映低利率時代以來的結構性重估。' }
+      { c: '#2A82B8', t: '估值位置', b: '最新預估本益比 ' + c.fpe.toFixed(1) + 'x（' + c.d + '）；近5年均值 ' + s5.mean.toFixed(1) + 'x（' + sgn(z5) + '）、近10年均值 ' + s10.mean.toFixed(1) + 'x（' + sgn(z10) + '）。' },
+      { c: '#12A06A', t: '預估 EPS 變化', b: '預估EPS 由 ' + y1.d + ' 的 $' + y1.feps.toFixed(0) + ' 到 $' + c.feps.toFixed(0) + '（' + pct(c.feps, y1.feps) + '），指數同期 ' + pct(c.px, y1.px) + '。' + (c.px / y1.px > c.feps / y1.feps ? '指數漲幅大於預估盈餘，評價在擴張。' : '預估盈餘成長快於指數，評價在壓縮。') },
+      { c: '#F5852F', t: '預估 vs 近四季', b: '預估本益比 ' + c.fpe.toFixed(1) + 'x，近四季本益比 ' + c.tpe.toFixed(1) + 'x，兩者落差 ' + (c.tpe - c.fpe).toFixed(1) + ' 點，反映市場預期未來 12 個月盈餘成長約 ' + ((c.tpe / c.fpe - 1) * 100).toFixed(0) + '%。預估若下修，落差會縮小。' },
+      { c: '#7C6BD6', t: '觀測區間極值', b: '2013 年以來預估本益比最高 ' + mx.fpe.toFixed(1) + 'x（' + mx.d + '），最低 ' + mn.fpe.toFixed(1) + 'x（' + mn.d + '）；最新值在區間的 ' + ((c.fpe - mn.fpe) / (mx.fpe - mn.fpe) * 100).toFixed(0) + '% 位置。' }
     ];
-    $('#ins').innerHTML = cards.map(function (c) {
-      return '<div class="ins" style="--c:' + c.c + '"><b>' + c.t + '</b><p>' + c.b + '</p></div>';
-    }).join('');
+    $('#ins').innerHTML = cards.map(function (x) { return '<div class="ins" style="--c:' + x.c + '"><b>' + x.t + '</b><p>' + x.b + '</p></div>'; }).join('');
   }
 
-  document.addEventListener('click', function (e) {
-    var b = e.target.closest('button[data-k]');
-    if (!b) return;
-    var kv = b.getAttribute('data-k').split(':');
-    state[kv[0]] = kv[1];
-    render();
+  document.addEventListener('click', function (e) { var b = e.target.closest('button[data-k]'); if (!b) return; var kv = b.getAttribute('data-k').split(':'); state[kv[0]] = kv[1]; render(); });
+  if (typeof Chart !== 'undefined') { Chart.defaults.color = '#36536B'; Chart.defaults.borderColor = '#E1ECF4'; }
+  load().then(function (res) { build(res); render(); }).catch(function (e) {
+    $('#stampTxt').textContent = '資料載入失敗';
+    $('#warn').textContent = '讀不到 market/data/market.json（或 data/spx.json）。請確認 GitHub Actions 的「大盤估值資料更新」已成功執行。錯誤：' + e.message;
   });
-
-  if (typeof Chart !== 'undefined') {
-    Chart.defaults.color = '#36536B';
-    Chart.defaults.borderColor = '#E1ECF4';
-    Chart.defaults.font.family = "'Noto Sans TC','Microsoft JhengHei',system-ui,sans-serif";
-  }
-  render();
 })();
 </script>
