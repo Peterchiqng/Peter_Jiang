@@ -827,7 +827,7 @@ body #sd-root td{font-weight:600}
   $('#fs-tabs').addEventListener('change', function (e) {
     if (e.target.id === 'fs-pick') { fsCode = e.target.value; renderFS(); }
   });
-  fetch('data/factset.json').then(function (r) { if (!r.ok) throw new Error('none'); return r.json(); })
+  fetch('stock/data/factset.json').then(function (r) { if (!r.ok) throw new Error('none'); return r.json(); })
     .then(function (obj) { Object.keys(obj).forEach(function (k) { FACTSET[k] = obj[k]; }); if (model) renderFS(); })
     .catch(function () { /* 沒有 data/factset.json 時使用內建資料 */ });
 
