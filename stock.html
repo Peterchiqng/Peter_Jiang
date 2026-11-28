@@ -1,30 +1,51 @@
 <!DOCTYPE html>
-<html lang="zh-TW"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
+<html lang="zh-TW">
+<head>
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>個股投資儀表板</title>
-<meta name="color-scheme" content="light dark">
-<style>html,body{margin:0;background:#0E1116}@media (prefers-color-scheme: light){html,body{background:#F6F6F3}}body{padding:12px}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>html,body{margin:0;background:#030712}body{padding:0}
+:root{--grad:linear-gradient(120deg,#2563eb 0%,#38bdf8 45%,#f97316 100%)}
+.site-nav{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:10px 18px;background:rgba(6,10,18,.9);backdrop-filter:blur(8px);border-bottom:1px solid #1b2740;font-family:'Noto Sans TC','Microsoft JhengHei',system-ui,sans-serif}
+.site-nav .brand{display:flex;align-items:center;gap:8px;font-weight:800;color:#e6edf7;text-decoration:none;font-size:15px}
+.site-nav .brand i{width:12px;height:12px;border-radius:50%;background:var(--grad);display:inline-block}
+.site-nav nav{display:flex;gap:4px;flex-wrap:wrap}
+.site-nav nav a{color:#7c8aa5;text-decoration:none;font-size:13px;font-weight:600;padding:7px 14px;border-radius:8px;border:1px solid transparent}
+.site-nav nav a:hover{color:#e6edf7;border-color:#1b2740}
+.site-nav nav a.active{color:#fff;background:linear-gradient(#0f1729,#0f1729) padding-box,var(--grad) border-box}
+#sd-root{padding:14px 12px}
+#sd-root h1{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+#sd-root h1 small{-webkit-text-fill-color:#64748b}</style>
 </head>
 <body>
+<header class="site-nav">
+  <a class="brand" href="index.html"><i></i>投資儀表板</a>
+  <nav>
+    <a href="index.html">S&amp;P 500 預估估值</a>
+    <a href="taiex.html">台股大盤本益比</a>
+    <a href="stock.html" class="active">個股儀表板</a>
+  </nav>
+</header>
 <div id="sd-root">
   <div class="sd-head">
     <div>
-      <h1>個股投資儀表板 <small style="font-size:12px;color:#64748b;font-weight:400">v5</small></h1>
+      <h1>個股投資儀表板 <small style="font-size:12px;color:#64748b;font-weight:400">v4</small></h1>
       <p class="sd-sub">本益比河流圖 · 月營收 · 利潤率 · EPS · 損益表 · 標準差分析</p>
     </div>
-    <span id="sd-src" class="sd-badge live">FinMind 即時資料</span>
+    <span id="sd-src" class="sd-badge">尚未載入</span>
   </div>
 
   <div class="sd-search">
     <div class="sd-inwrap">
-      <input id="sd-q" type="text" autocomplete="off" placeholder="輸入股票代號或名稱，例如 2330、台積電、儒鴻">
-      <div id="sd-sugg" class="sd-sugg" hidden=""></div>
+      <input id="sd-q" type="text" autocomplete="off" placeholder="輸入股票代號或名稱，例如 2330、台積電、儒鴻" />
+      <div id="sd-sugg" class="sd-sugg" hidden></div>
     </div>
     <button id="sd-go" type="button">查詢</button>
     <select id="sd-range" title="資料年限">
       <option value="3">近3年</option>
-      <option value="5" selected="">近5年</option>
+      <option value="5" selected>近5年</option>
       <option value="10">近10年</option>
     </select>
     <select id="sd-band" title="河流圖倍數">
@@ -32,183 +53,138 @@
       <option value="auto">倍數帶：依歷史分位自動</option>
     </select>
   </div>
-  <div class="sd-chips" id="sd-chips"><button type="button" class="sd-chip" data-id="2330">2330 台積電</button><button type="button" class="sd-chip" data-id="1476">1476 儒鴻</button><button type="button" class="sd-chip" data-id="1101">1101 台泥</button><button type="button" class="sd-chip" data-id="1477">1477 聚陽</button><button type="button" class="sd-chip" data-id="4766">4766 南寶</button><button type="button" class="sd-chip" data-id="2317">2317 鴻海</button></div>
+  <div class="sd-chips" id="sd-chips"></div>
   <details class="sd-token">
     <summary>進階：FinMind API token（選填，提高請求上限）</summary>
-    <input id="sd-token" type="password" placeholder="貼上 FinMind token；僅保存在目前頁面記憶體，不會儲存">
+    <input id="sd-token" type="password" placeholder="貼上 FinMind token；僅保存在目前頁面記憶體，不會儲存" />
   </details>
-  <div id="sd-status" class="sd-status ok">資料來源：FinMind 即時 · 最新交易日 2026-10-27</div>
+  <div id="sd-status" class="sd-status">準備中…</div>
 
-  <div id="sd-title" class="sd-title"><span class="nm">台積電</span><span class="cd">2330</span><span class="px">2,400.00</span><span style="font-family:var(--mono);color:#f87171">▲ 15.00 (+0.63%)</span><span style="color:#475569;font-size:12px">2026-10-27</span></div>
-  <div id="sd-cards" class="sd-cards"><div class="sd-card"><div class="l">收盤價</div><div class="v" style="color:#38bdf8">2,400.00</div><div class="s">2026-10-27</div></div><div class="sd-card"><div class="l">本益比（自算）</div><div class="v" style="color:#f97316">27.8x</div><div class="s">價 ÷ 近四季EPS</div></div><div class="sd-card"><div class="l">本益比（官方）</div><div class="v" style="color:#fb923c">27.8x</div><div class="s">TWSE/TPEx</div></div><div class="sd-card"><div class="l">股價淨值比</div><div class="v" style="color:#a78bfa">9.68x</div><div class="s">PBR</div></div><div class="sd-card"><div class="l">殖利率</div><div class="v" style="color:#22c55e">0.92%</div><div class="s">現金股利</div></div><div class="sd-card"><div class="l">近四季EPS</div><div class="v" style="color:#a3e635">86.28</div><div class="s">2026-Q2</div></div><div class="sd-card"><div class="l">最新月營收年增</div><div class="v" style="color:#f87171">+54.6%</div><div class="s">2026-09</div></div><div class="sd-card"><div class="l">最新毛利率</div><div class="v" style="color:#38bdf8">67.7%</div><div class="s">2026-Q2</div></div><div class="sd-card"><div class="l">最新營業利益率</div><div class="v" style="color:#0ea5e9">60.3%</div><div class="s">2026-Q2</div></div><div class="sd-card"><div class="l">本益比 Z-score</div><div class="v" style="color:#eab308">+0.97σ</div><div class="s">均值 22.2x · σ 5.8</div></div></div>
+  <div id="sd-title" class="sd-title"></div>
+  <div id="sd-cards" class="sd-cards"></div>
 
   <div class="sd-panel" id="p-river">
     <h2>本益比河流圖 <small>月收盤價 vs 近四季EPS × 倍數</small></h2>
-    <div class="sd-cv"><canvas id="c-river" width="1757" height="562" style="display: block; box-sizing: border-box; height: 360px; width: 1125px;"></canvas></div>
+    <div class="sd-cv"><canvas id="c-river"></canvas></div>
   </div>
 
   <div class="sd-grid">
     <div class="sd-panel" id="p-rev">
       <h2>月營收與年增率 <small>億元 / %</small></h2>
-      <div class="sd-cv sm"><canvas id="c-rev" width="848" height="406" style="display: block; box-sizing: border-box; height: 260px; width: 542px;"></canvas></div>
+      <div class="sd-cv sm"><canvas id="c-rev"></canvas></div>
     </div>
     <div class="sd-panel" id="p-margin">
       <h2>季度利潤率 <small>%</small></h2>
-      <div class="sd-cv sm"><canvas id="c-margin" width="848" height="406" style="display: block; box-sizing: border-box; height: 260px; width: 542px;"></canvas></div>
+      <div class="sd-cv sm"><canvas id="c-margin"></canvas></div>
     </div>
     <div class="sd-panel" id="p-eps">
       <h2>單季EPS與近四季EPS <small>元</small></h2>
-      <div class="sd-cv sm"><canvas id="c-eps" width="848" height="406" style="display: block; box-sizing: border-box; height: 260px; width: 542px;"></canvas></div>
+      <div class="sd-cv sm"><canvas id="c-eps"></canvas></div>
     </div>
     <div class="sd-panel" id="p-pe">
       <h2>本益比走勢與標準差帶 <small>倍</small></h2>
-      <div class="sd-cv sm"><canvas id="c-pe" width="848" height="406" style="display: block; box-sizing: border-box; height: 260px; width: 542px;"></canvas></div>
+      <div class="sd-cv sm"><canvas id="c-pe"></canvas></div>
     </div>
   </div>
 
   <div class="sd-panel" id="p-tbl">
     <h2>季度損益表 <small>億元</small></h2>
-    <div class="sd-tblwrap"><table id="sd-tbl"><tbody><tr><th>季度</th><th>營收</th><th>毛利</th><th>營業利益</th><th>稅前淨利</th><th>稅後淨利</th><th>EPS</th><th>毛利率</th><th>營益率</th></tr><tr><td>2026-Q2</td><td>12,703.8</td><td>8,603.1</td><td>7,666.0</td><td>8,624.3</td><td>7,067.8</td><td>27.25</td><td>67.7%</td><td>60.3%</td></tr><tr><td>2026-Q1</td><td>11,341.0</td><td>7,513.0</td><td>6,589.7</td><td>6,878.0</td><td>5,728.0</td><td>22.08</td><td>66.2%</td><td>58.1%</td></tr><tr><td>2025-Q4</td><td>10,460.9</td><td>6,519.9</td><td>5,649.0</td><td>5,923.6</td><td>5,054.2</td><td>19.51</td><td>62.3%</td><td>54.0%</td></tr><tr><td>2025-Q3</td><td>9,899.2</td><td>5,885.4</td><td>5,006.8</td><td>5,253.7</td><td>4,517.6</td><td>17.44</td><td>59.5%</td><td>50.6%</td></tr><tr><td>2025-Q2</td><td>9,337.9</td><td>5,473.7</td><td>4,634.2</td><td>4,930.4</td><td>3,974.9</td><td>15.36</td><td>58.6%</td><td>49.6%</td></tr><tr><td>2025-Q1</td><td>8,392.5</td><td>4,934.0</td><td>4,070.8</td><td>4,309.0</td><td>3,607.3</td><td>13.95</td><td>58.8%</td><td>48.5%</td></tr><tr><td>2024-Q4</td><td>8,684.6</td><td>5,123.8</td><td>4,257.1</td><td>4,488.0</td><td>3,744.7</td><td>14.45</td><td>59.0%</td><td>49.0%</td></tr><tr><td>2024-Q3</td><td>7,596.9</td><td>4,393.5</td><td>3,607.7</td><td>3,841.9</td><td>3,250.8</td><td>12.55</td><td>57.8%</td><td>47.5%</td></tr></tbody></table></div>
+    <div class="sd-tblwrap"><table id="sd-tbl"></table></div>
   </div>
 
   <style>
-  #sd-root .fs-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px;align-items:center}
-  #sd-root .fs-tabs button{background:transparent;color:var(--mu);border:1px solid var(--ln);padding:5px 14px;font-size:12px;font-weight:500;border-radius:8px}
-  #sd-root .fs-tabs button:hover{border-color:var(--ln2);color:var(--tx);background:transparent}
-  #sd-root .fs-tabs button.on{border-color:var(--ac);color:var(--ac);background:var(--acw)}
-  #sd-root .fs-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:0 0 10px}
-  #sd-root .fs-search{display:flex;gap:6px;flex:1 1 320px;min-width:0}
-  #sd-root .fs-search input{flex:1;min-width:0;padding:8px 12px;font-size:13px}
-  #sd-root .fs-search button{padding:8px 16px;font-size:13px}
-  #sd-root .fs-bar .fs-tabs{margin:0}
-  #sd-root .fs-note.err{color:var(--up)}
-  @media(max-width:600px){#sd-root .fs-search{flex:1 1 100%}#sd-root .fs-tabs{overflow-x:auto;flex-wrap:nowrap}#sd-root .fs-tabs button{flex:0 0 auto}}
-  #sd-root h3{font-size:12px;font-weight:500;color:var(--mu);margin:4px 0 8px}
-  #sd-root .fs-note{font-size:12px;color:var(--mu);line-height:1.7;margin-bottom:10px}
-  #sd-root .fs-method{font-size:11px;color:var(--mu2);line-height:1.8;margin:12px 0 0}
-  #sd-root .fs-sub{margin-top:16px}
+  #sd-root .fs-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 10px;align-items:center}
+  #sd-root .fs-tabs button{background:transparent;color:#94a3b8;border:1px solid var(--ln);padding:5px 14px;font-size:12px;font-weight:600;border-radius:8px}
+  #sd-root .fs-tabs button:hover{border-color:var(--ac);color:var(--ac)}
+  #sd-root .fs-tabs button.on{border-color:var(--ac);color:var(--ac);background:#38bdf822}
+  #sd-root .fs-tabs select{width:auto;padding:6px 10px;font-size:12px}
+  #sd-root h3{font-size:12px;font-weight:600;color:#94a3b8;margin:4px 0 6px}
+  #sd-root .fs-note{font-size:12px;color:#94a3b8;line-height:1.7;margin-bottom:8px}
+  #sd-root .fs-method{font-size:11px;color:#475569;line-height:1.8;margin:12px 0 0}
+  #sd-root .fs-sub{margin-top:14px}
   </style>
   <div class="sd-panel" id="p-fs">
-    <h2>FactSet 分析師預估 <small>EPS 共識 · 目標價 · 評級</small></h2>
-    <div class="fs-bar">
-      <div class="fs-search">
-        <input id="fs-q" type="text" list="fs-list" autocomplete="off" placeholder="輸入代號或名稱查 FactSet 預估，例如 2330、欣興" aria-label="查詢 FactSet 預估的股票">
-        <button id="fs-go" type="button">查詢</button>
-        <datalist id="fs-list"></datalist>
-      </div>
-      <div class="fs-tabs" id="fs-tabs"></div>
-    </div>
-    <div class="fs-note" id="fs-note">載入 FactSet 資料中…</div>
+    <h2>FactSet 分析師預估 <small>EPS共識分佈 · 目標價 · 評級（整理自鉅亨網「Factset 最新調查」）</small></h2>
+    <div class="fs-tabs" id="fs-tabs"></div>
+    <div class="fs-note" id="fs-note"></div>
     <div id="fs-body">
-      <div class="sd-cards" id="fs-cards"><div class="sd-card"><div class="l">分析師家數</div><div class="v" style="color:#94a3b8">17 位</div><div class="s">≈2026-09-05</div></div><div class="sd-card"><div class="l">平均數</div><div class="v" style="color:#facc15">24.58</div><div class="s">2026 年EPS（FactSet公布）</div></div><div class="sd-card"><div class="l">中位數</div><div class="v" style="color:#ffffff">24.47</div><div class="s">平均−中位 +0.11</div></div><div class="sd-card"><div class="l">最高估值</div><div class="v" style="color:#f87171">25.55</div><div class="s">高於中位數 +4.4%</div></div><div class="sd-card"><div class="l">最低估值</div><div class="v" style="color:#4ade80">23.23</div><div class="s">低於中位數 -5.1%</div></div><div class="sd-card"><div class="l">全距</div><div class="v" style="color:#94a3b8">2.32</div><div class="s">最高 − 最低</div></div><div class="sd-card"><div class="l">標準差（估）σ̂</div><div class="v" style="color:#f97316">0.65</div><div class="s">全距 ÷ d2(17) = 2.32 ÷ 3.588</div></div><div class="sd-card"><div class="l">變異係數 CV</div><div class="v" style="color:#fb923c">2.63%</div><div class="s">σ̂ ÷ 平均數</div></div><div class="sd-card"><div class="l">偏態指標</div><div class="v" style="color:#a78bfa">+0.17</div><div class="s">(平均−中位)÷σ̂</div></div><div class="sd-card"><div class="l">共識σ（實測）</div><div class="v" style="color:#38bdf8">0.23</div><div class="s">中位數於 4 次調查間</div></div></div>
+      <div class="sd-cards" id="fs-cards"></div>
       <div class="sd-grid">
-        <div><h3>各年度EPS預估分佈（最低~最高、平均±1σ̂、平均、中位數）</h3><div class="sd-cv sm"><canvas id="c-fs-dist" width="867" height="406" style="display: block; box-sizing: border-box; height: 260px; width: 555px;"></canvas></div></div>
-        <div><h3>共識隨 FactSet 調查時間的變化</h3><div class="sd-cv sm"><canvas id="c-fs-time" width="867" height="406" style="display: block; box-sizing: border-box; height: 260px; width: 555px;"></canvas></div></div>
-        <div><h3>目標價共識（中位數、最高、最低）與現價</h3><div class="sd-cv sm"><canvas id="c-fs-tp" width="867" height="406" style="display: block; box-sizing: border-box; height: 260px; width: 555px;"></canvas></div></div>
-        <div><h3>分析師評級分佈</h3><div class="sd-cv sm"><canvas id="c-fs-rate" width="867" height="406" style="display: block; box-sizing: border-box; height: 260px; width: 555px;"></canvas></div></div>
+        <div><h3>各年度EPS預估分佈（最低~最高、平均±1σ̂、平均、中位數）</h3><div class="sd-cv sm"><canvas id="c-fs-dist"></canvas></div></div>
+        <div><h3>共識隨 FactSet 調查時間的變化</h3><div class="sd-cv sm"><canvas id="c-fs-time"></canvas></div></div>
+        <div><h3>目標價共識（中位數、最高、最低）與現價</h3><div class="sd-cv sm"><canvas id="c-fs-tp"></canvas></div></div>
+        <div><h3>分析師評級分佈</h3><div class="sd-cv sm"><canvas id="c-fs-rate"></canvas></div></div>
       </div>
-      <div class="fs-sub sd-tblwrap" id="fs-tbls"><h3>分析師預估分佈（最新一次調查）</h3><table><tbody><tr><th>年度</th><th>家數</th><th>平均數</th><th>中位數</th><th>最高</th><th>最低</th><th>全距</th><th>σ̂（估）</th><th>CV</th><th>偏態</th><th>最高z</th><th>最低z</th></tr><tr><td>2026</td><td>17</td><td>24.58</td><td>24.47</td><td>25.55</td><td>23.23</td><td>2.32</td><td>0.65</td><td>2.63%</td><td>0.17</td><td>1.50</td><td>-2.09</td></tr><tr><td>2027</td><td>17</td><td>26.72</td><td>26.58</td><td>28.40</td><td>24.72</td><td>3.68</td><td>1.03</td><td>3.84%</td><td>0.14</td><td>1.64</td><td>-1.95</td></tr><tr><td>2028</td><td>17</td><td>29.88</td><td>30.56</td><td>32.35</td><td>26.43</td><td>5.92</td><td>1.65</td><td>5.52%</td><td>-0.41</td><td>1.50</td><td>-2.09</td></tr></tbody></table><h3 class="fs-sub">共識變化：各次調查的中位數統計（平均、中位數、標準差、最小、最大為實際計算值）</h3><table><tbody><tr><th>年度</th><th>調查次數</th><th>首次中位數</th><th>最新中位數</th><th>變動</th><th>平均</th><th>中位數</th><th>σ（實測）</th><th>最小</th><th>最大</th></tr><tr><td>2026</td><td>4</td><td>23.99</td><td>24.47</td><td>+2.0%</td><td>24.33</td><td>24.44</td><td>0.23</td><td>23.99</td><td>24.47</td></tr><tr><td>2027</td><td>3</td><td>27.32</td><td>26.58</td><td>-2.7%</td><td>27.07</td><td>27.32</td><td>0.43</td><td>26.58</td><td>27.32</td></tr><tr><td>2028</td><td>3</td><td>30.96</td><td>30.56</td><td>-1.3%</td><td>30.81</td><td>30.90</td><td>0.22</td><td>30.56</td><td>30.96</td></tr></tbody></table></div>
+      <div class="fs-sub sd-tblwrap" id="fs-tbls"></div>
+      <ul class="sd-ins fs-sub" id="fs-ins"></ul>
+      <p class="fs-method">統計說明：平均數、中位數、最高、最低為 FactSet 公布值。FactSet 快訊沒有公布個別分析師的估值，因此「標準差 σ̂」以全距推估：σ̂ = (最高 − 最低) ÷ d2(n)，d2(n) 是常態分佈下 n 個樣本的期望全距係數（n=15 為 3.472、n=17 為 3.588），屬估計值，且對極端值敏感。「共識σ（實測）」是各次調查之中位數的實際標準差，樣本數是調查次數，次數少時僅供參考。標示 ≈ 的日期是依新聞發布時間推算。資料僅供參考，不構成投資建議。</p>
     </div>
   </div>
 
   <div class="sd-panel" id="p-ins">
     <h2>數據摘要</h2>
-    <ul id="sd-ins" class="sd-ins"><li>估值位置：自算本益比 27.8x（近四季EPS 86.28），落在 24~28 倍帶之間。相對近5年月資料均值 22.2x，Z-score +0.97σ，約高於 80% 的歷史月份。</li><li>營收動能：2026-09 月營收 5,118.6 億，年增 +54.6%、月增 -0.6%；近3月平均年增 +50.9%。</li><li>獲利能力：2026-Q2 毛利率 67.7%（較去年同期 +9.1 個百分點），營業利益率 60.3%。</li><li>EPS：2026-Q2 單季 27.25 元，季增 +23.4%，年增 +77.4%。</li><li>獲利品質：業外損益占稅前淨利 11.1%（前一季 4.2%），業外比重大幅變動時，EPS變化不全來自本業。</li></ul>
+    <ul id="sd-ins" class="sd-ins"></ul>
   </div>
 
   <p class="sd-foot">版本 v5（2026-10-24）· FactSet 預估整理自鉅亨網快訊，內建 1476 儒鴻、1477 聚陽，其他股票可編輯 data/factset.json 擴充 · 資料來源：FinMind 開放金融資料 API（來源為證交所、公開資訊觀測站）；示範資料為股市爆料同學會（CMoney）2026/10 快照。EPS採季報單季值，近四季EPS為最近四季加總；河流圖以月收盤價對照已公布之近四季EPS。本工具僅供資訊整理，不構成投資建議。</p>
 </div>
 
 <style>
-#sd-root{--bg:#0E1116;--pn:#161A21;--cd:#1B2029;--ln:#262B34;--ln2:#3A404B;--tx:#E6E8EB;--tx2:#C4C9D1;--mu:#8B93A1;--mu2:#646B77;--ac:#5B8DEF;--acw:rgba(91,141,239,.14);--up:#F0524D;--dn:#22B573;--warn:#E0A23B;--grid:#20252D;
-  --mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
-  background:var(--bg);color:var(--tx);padding:24px 20px;border-radius:16px;font-family:'Noto Sans TC','Microsoft JhengHei',system-ui,sans-serif;max-width:1200px;margin:0 auto;box-sizing:border-box}
-@media (prefers-color-scheme: light){
-#sd-root{--bg:#F6F6F3;--pn:#FFFFFF;--cd:#FAFAF8;--ln:#E4E4DF;--ln2:#CFCFC8;--tx:#1D2125;--tx2:#3D434A;--mu:#6B7280;--mu2:#9AA0A8;--ac:#2F6FEB;--acw:rgba(47,111,235,.10);--up:#D9342B;--dn:#12925A;--warn:#B7791F;--grid:#EEEEEA}
-}
+#sd-root{--bg:#030712;--pn:#0a0f1e;--ln:#1e293b;--tx:#e2e8f0;--mu:#64748b;--ac:#38bdf8;--mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+  background:var(--bg);color:var(--tx);padding:20px 18px;border-radius:14px;font-family:'Noto Sans TC','Microsoft JhengHei',system-ui,sans-serif;max-width:1200px;margin:0 auto;box-sizing:border-box}
 #sd-root *{box-sizing:border-box}
-#sd-root h1{font-size:24px;font-weight:600;margin:0;letter-spacing:-.01em}
-#sd-root h2{font-size:14px;font-weight:600;margin:0 0 12px;color:var(--tx)}
+#sd-root h1{font-size:24px;font-weight:800;margin:0;letter-spacing:-.01em}
+#sd-root h2{font-size:14px;font-weight:700;margin:0 0 10px;color:#cbd5e1}
 #sd-root h2 small{font-weight:400;color:var(--mu);margin-left:8px;font-size:11px}
-#sd-root .sd-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+#sd-root .sd-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:14px}
 #sd-root .sd-sub{margin:4px 0 0;color:var(--mu);font-size:12px}
 #sd-root .sd-badge{font-size:11px;padding:4px 10px;border-radius:999px;border:1px solid var(--ln);color:var(--mu);white-space:nowrap}
-#sd-root .sd-badge.live{color:var(--ac);border-color:var(--ac);background:var(--acw)}
-#sd-root .sd-badge.sample{color:var(--warn);border-color:var(--warn);background:transparent}
+#sd-root .sd-badge.live{color:#22c55e;border-color:#166534;background:#052e16}
+#sd-root .sd-badge.sample{color:#facc15;border-color:#854d0e;background:#1c1405}
 #sd-root .sd-search{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
 #sd-root .sd-inwrap{position:relative;flex:1 1 280px}
 #sd-root input[type=text],#sd-root input[type=password],#sd-root select{background:var(--pn);border:1px solid var(--ln);color:var(--tx);border-radius:8px;padding:10px 12px;font-size:14px;font-family:inherit;width:100%}
 #sd-root select{width:auto}
-#sd-root input::placeholder{color:var(--mu2)}
-#sd-root input:focus,#sd-root select:focus{outline:none;border-color:var(--ac);box-shadow:0 0 0 3px var(--acw)}
-#sd-root button{background:var(--ac);color:#fff;border:0;border-radius:8px;padding:10px 20px;font-weight:600;cursor:pointer;font-size:14px}
-#sd-root button:hover{filter:brightness(1.08)}
-#sd-root .sd-sugg{position:absolute;z-index:20;left:0;right:0;top:calc(100% + 4px);background:var(--pn);border:1px solid var(--ln);border-radius:8px;max-height:260px;overflow:auto;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+#sd-root input:focus,#sd-root select:focus{outline:none;border-color:var(--ac)}
+#sd-root button{background:#0ea5e9;color:#00131f;border:0;border-radius:8px;padding:10px 20px;font-weight:700;cursor:pointer;font-size:14px}
+#sd-root button:hover{background:#38bdf8}
+#sd-root .sd-sugg{position:absolute;z-index:20;left:0;right:0;top:calc(100% + 4px);background:#0f172a;border:1px solid #334155;border-radius:8px;max-height:260px;overflow:auto}
 #sd-root .sd-sugg div{padding:8px 12px;font-size:13px;cursor:pointer;display:flex;gap:10px}
-#sd-root .sd-sugg div:hover{background:var(--cd)}
-#sd-root .sd-sugg b{font-family:var(--mono);color:var(--ac);min-width:52px;font-weight:500}
-#sd-root .sd-chips{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0 4px}
-#sd-root .sd-chip{font-size:12px;padding:4px 12px;border:1px solid var(--ln);border-radius:999px;color:var(--mu);cursor:pointer;background:transparent;font-weight:400}
-#sd-root .sd-chip:hover{border-color:var(--ln2);color:var(--tx);background:transparent;filter:none}
+#sd-root .sd-sugg div:hover{background:#1e293b}
+#sd-root .sd-sugg b{font-family:var(--mono);color:var(--ac);min-width:52px}
+#sd-root .sd-chips{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 4px}
+#sd-root .sd-chip{font-size:12px;padding:4px 10px;border:1px solid var(--ln);border-radius:999px;color:#94a3b8;cursor:pointer;background:transparent}
+#sd-root .sd-chip:hover{border-color:var(--ac);color:var(--ac)}
 #sd-root .sd-token{margin:6px 0;font-size:12px;color:var(--mu)}
 #sd-root .sd-token summary{cursor:pointer}
 #sd-root .sd-token input{margin-top:6px;max-width:420px}
-#sd-root .sd-status{font-size:12px;margin:8px 0 16px;color:var(--mu);min-height:18px}
-#sd-root .sd-status.ok{color:var(--mu)}
-#sd-root .sd-status.warn{color:var(--warn)}
-#sd-root .sd-status.err{color:var(--up)}
-#sd-root .sd-title{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:12px}
-#sd-root .sd-title .nm{font-size:22px;font-weight:600}
-#sd-root .sd-title .cd{font-family:var(--mono);color:var(--mu);font-size:15px}
-#sd-root .sd-title .px{font-family:var(--mono);font-size:22px;font-weight:600}
-#sd-root .sd-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:8px;margin-bottom:16px}
-#sd-root .sd-card{background:var(--pn);border:1px solid var(--ln);border-radius:10px;padding:10px 12px}
-#sd-root .sd-panel .sd-card{background:var(--cd)}
-#sd-root .sd-card .l{font-size:11px;color:var(--mu);margin-bottom:4px}
-#sd-root .sd-card .v{font-family:var(--mono);font-size:18px;font-weight:600;line-height:1.15}
-#sd-root .sd-card .s{font-size:10px;color:var(--mu2);margin-top:4px}
-#sd-root .sd-panel{background:var(--pn);border:1px solid var(--ln);border-radius:12px;padding:16px 14px 12px;margin-bottom:16px}
+#sd-root .sd-status{font-size:12px;margin:8px 0 14px;color:var(--mu);min-height:18px}
+#sd-root .sd-status.ok{color:#22c55e}
+#sd-root .sd-status.warn{color:#facc15}
+#sd-root .sd-status.err{color:#f87171}
+#sd-root .sd-title{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+#sd-root .sd-title .nm{font-size:22px;font-weight:800}
+#sd-root .sd-title .cd{font-family:var(--mono);color:var(--ac);font-size:16px}
+#sd-root .sd-title .px{font-family:var(--mono);font-size:22px;font-weight:700}
+#sd-root .sd-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:8px;margin-bottom:14px}
+#sd-root .sd-card{background:#0f172a;border:1px solid var(--ln);border-radius:10px;padding:10px 12px}
+#sd-root .sd-card .l{font-size:10px;color:var(--mu);margin-bottom:3px}
+#sd-root .sd-card .v{font-family:var(--mono);font-size:18px;font-weight:700;line-height:1.1}
+#sd-root .sd-card .s{font-size:10px;color:#475569;margin-top:3px}
+#sd-root .sd-panel{background:var(--pn);border:1px solid var(--ln);border-radius:12px;padding:14px 12px 10px;margin-bottom:14px}
 #sd-root .sd-panel[hidden]{display:none}
-#sd-root .sd-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
-#sd-root .sd-panel,#sd-root .sd-grid>*{min-width:0}
-#sd-root .sd-cv canvas{max-width:100%}
+#sd-root .sd-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 #sd-root .sd-grid .sd-panel{margin-bottom:0}
-@media(max-width:900px){#sd-root .sd-grid{grid-template-columns:minmax(0,1fr)}}
-@media(max-width:600px){
-  body{padding:0}
-  #sd-root{padding:16px 12px;border-radius:0}
-  #sd-root h1{font-size:20px}
-  #sd-root .sd-head{margin-bottom:12px}
-  #sd-root .sd-badge{font-size:10px;padding:3px 8px}
-  #sd-root .sd-search{gap:6px}
-  #sd-root .sd-inwrap{flex:1 1 100%}
-  #sd-root .sd-search button{flex:1 1 auto;padding:10px 12px}
-  #sd-root .sd-search select{flex:1 1 40%;font-size:13px;padding:9px 8px}
-  #sd-root .sd-chips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
-  #sd-root .sd-chip{flex:0 0 auto}
-  #sd-root .sd-title{gap:8px}
-  #sd-root .sd-title .nm,#sd-root .sd-title .px{font-size:18px}
-  #sd-root .sd-cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
-  #sd-root .sd-card{padding:8px 10px}
-  #sd-root .sd-card .v{font-size:16px}
-  #sd-root .sd-panel{padding:12px 8px 8px;border-radius:10px}
-  #sd-root .sd-panel h2{padding:0 4px}
-  #sd-root .sd-panel .sd-cv{height:300px}
-  #sd-root .sd-panel .sd-cv.sm{height:230px}
-  #sd-root .sd-ins{font-size:12.5px;line-height:1.8}
-  #sd-root table{font-size:11px}
-  #sd-root th,#sd-root td{padding:6px 8px}
-}
+@media(max-width:900px){#sd-root .sd-grid{grid-template-columns:1fr}}
 #sd-root .sd-cv{position:relative;height:360px}
 #sd-root .sd-cv.sm{height:260px}
 #sd-root .sd-tblwrap{overflow-x:auto}
 #sd-root table{width:100%;border-collapse:collapse;font-size:12px}
-#sd-root th{color:var(--mu);font-weight:500;text-align:right;padding:8px 10px;border-bottom:1px solid var(--ln);white-space:nowrap;background:transparent}
-#sd-root td{text-align:right;padding:8px 10px;font-family:var(--mono);border-bottom:1px solid var(--grid);white-space:nowrap}
-#sd-root tr:hover td{background:var(--cd)}
+#sd-root th{color:var(--mu);font-weight:500;text-align:right;padding:7px 9px;border-bottom:1px solid var(--ln);white-space:nowrap;background:#0f172a}
+#sd-root td{text-align:right;padding:7px 9px;font-family:var(--mono);border-bottom:1px solid #0f172a;white-space:nowrap}
 #sd-root th:first-child,#sd-root td:first-child{text-align:left}
-#sd-root .sd-ins{margin:0;padding-left:18px;font-size:13px;line-height:1.9;color:var(--tx2)}
-#sd-root .sd-foot{font-size:11px;color:var(--mu2);line-height:1.8;margin:16px 0 0}
+#sd-root .sd-ins{margin:0;padding-left:18px;font-size:13px;line-height:1.9;color:#cbd5e1}
+#sd-root .sd-foot{font-size:11px;color:#475569;line-height:1.8;margin:14px 0 0}
 </style>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -256,26 +232,6 @@
 
   /* ===== 工具 ===== */
   var root = document.getElementById('sd-root');
-  /* 配色：讀取 CSS 變數，深色／淺色跟隨系統自動切換 */
-  var T = {};
-  function readT() { ['bg', 'pn', 'cd', 'ln', 'tx', 'tx2', 'mu', 'mu2', 'ac', 'up', 'dn', 'warn', 'grid'].forEach(function (k) { T[k] = getComputedStyle(root).getPropertyValue('--' + k).trim(); }); }
-  function rgba(hex, a) { hex = hex.replace('#', ''); if (hex.length === 3) hex = hex.split('').map(function (c) { return c + c; }).join(''); var n = parseInt(hex, 16); return 'rgba(' + (n >> 16 & 255) + ',' + (n >> 8 & 255) + ',' + (n & 255) + ',' + a + ')'; }
-  var CMAP = { '#ffffff': 'tx', '#38bdf8': 'ac', '#0ea5e9': 'ac', '#a3e635': 'ac', '#f97316': 'warn', '#facc15': 'warn', '#fb923c': 'tx', '#a78bfa': 'tx', '#22c55e': 'dn', '#4ade80': 'dn', '#f87171': 'up', '#ef4444': 'up', '#eab308': 'mu', '#94a3b8': 'mu', '#64748b': 'mu', '#1e293b': 'grid', '#0a0f1e': 'pn' };
-  var RMAP = { '56,189,248': 'ac', '249,115,22': 'warn', '163,230,53': 'ac', '34,197,94': 'dn', '239,68,68': 'up' };
-  function tc(x) {
-    if (typeof x !== 'string') return x;
-    var k = x.toLowerCase();
-    if (CMAP[k]) return T[CMAP[k]];
-    var m = k.replace(/\s/g, '').match(/^rgba\((\d+),(\d+),(\d+),([\d.]+)\)$/);
-    if (m && RMAP[m[1] + ',' + m[2] + ',' + m[3]]) return rgba(T[RMAP[m[1] + ',' + m[2] + ',' + m[3]]], m[4]);
-    return x;
-  }
-  function themed(o) {
-    if (Array.isArray(o)) return o.map(themed);
-    if (o && typeof o === 'object' && Object.getPrototypeOf(o) === Object.prototype) { var r = {}; Object.keys(o).forEach(function (k) { r[k] = themed(o[k]); }); return r; }
-    return tc(o);
-  }
-  function neutralCards(cards, keep) { cards.forEach(function (c, i) { c.c = keep.indexOf(i) >= 0 ? tc(c.c) : T.tx; }); return cards; }
   function $(s) { return root.querySelector(s); }
   function pad(n) { return String(n).padStart(2, '0'); }
   function ymd(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
@@ -289,7 +245,7 @@
     var s = a.slice().sort(function (x, y) { return x - y; }), p = (s.length - 1) * q, b = Math.floor(p);
     return s[b] + (s[Math.min(b + 1, s.length - 1)] - s[b]) * (p - b);
   }
-  function zc(z) { return z >= 1 ? T.up : z <= -1 ? T.dn : T.tx; }
+  function zc(z) { var a = Math.abs(z); return a >= 2 ? '#ef4444' : a >= 1 ? '#f97316' : a >= 0.5 ? '#eab308' : '#22c55e'; }
 
   var LIST = BUILTIN.slice(), model = null, token = '', charts = {};
 
@@ -440,26 +396,15 @@
   function mk(id, cfg) {
     if (typeof Chart === 'undefined') return;
     if (charts[id]) charts[id].destroy();
-    var c = themed(cfg);
-    (c.data && c.data.datasets || []).forEach(function (d) {
-      if ((d.type || c.type) === 'line' && typeof d.borderColor === 'string') {
-        if (d.pointBackgroundColor == null) d.pointBackgroundColor = d.borderColor;
-        if (d.pointBorderColor == null) d.pointBorderColor = d.borderColor;
-      }
-      if (d.order == null) d.order = (d.type || c.type) === 'bar' ? 2 : 1;
-    });
-    charts[id] = new Chart(document.getElementById(id), c);
+    charts[id] = new Chart(document.getElementById(id), cfg);
   }
-  function isMobile() { return window.innerWidth < 600; }
   function baseOpts(extra) {
-    var mob = isMobile();
     var o = {
       responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
-      layout: { padding: mob ? { left: 0, right: 2 } : 0 },
-      plugins: { legend: { labels: { color: '#94a3b8', boxWidth: mob ? 8 : 12, boxHeight: mob ? 8 : undefined, padding: mob ? 6 : 10, font: { size: mob ? 10 : 11 } } } },
+      plugins: { legend: { labels: { color: '#94a3b8', boxWidth: 12, font: { size: 11 } } } },
       scales: {
-        x: { ticks: { color: '#64748b', maxTicksLimit: mob ? 5 : 12, maxRotation: mob ? 0 : 50, autoSkipPadding: mob ? 8 : 3, font: { size: mob ? 9 : 10 } }, grid: { display: false } },
-        y: { ticks: { color: '#64748b', maxTicksLimit: mob ? 6 : 11, font: { size: mob ? 9 : 10 } }, grid: { color: '#1e293b' } }
+        x: { ticks: { color: '#64748b', maxTicksLimit: 12, font: { size: 10 } }, grid: { display: false } },
+        y: { ticks: { color: '#64748b', font: { size: 10 } }, grid: { color: '#1e293b' } }
       }
     };
     if (extra) Object.keys(extra).forEach(function (k) { o.scales[k] = extra[k]; });
@@ -470,8 +415,6 @@
   function render() {
     var m = model;
     if (!m) return;
-    readT();
-    if (typeof Chart !== 'undefined') { Chart.defaults.color = T.mu; Chart.defaults.borderColor = T.grid; }
     var mode = $('#sd-band').value;
     var yrs = +$('#sd-range').value;
 
@@ -482,9 +425,9 @@
 
     $('#sd-title').innerHTML = '<span class="nm">' + (m.name || '') + '</span><span class="cd">' + m.code + '</span>' +
       '<span class="px">' + fmt(m.price.close, 2) + '</span>' +
-      '<span style="font-family:var(--mono);color:' + (m.price.chg > 0 ? T.up : m.price.chg < 0 ? T.dn : T.mu) + '">' +
+      '<span style="font-family:var(--mono);color:' + (m.price.chg >= 0 ? '#f87171' : '#4ade80') + '">' +
       (m.price.chg > 0 ? '▲ ' : m.price.chg < 0 ? '▼ ' : '') + fmt(Math.abs(m.price.chg), 2) + ' (' + pct(m.price.pct, 2) + ')</span>' +
-      '<span style="color:var(--mu2);font-size:12px">' + m.price.date + '</span>';
+      '<span style="color:#475569;font-size:12px">' + m.price.date + '</span>';
 
     var qs = m.quarters.slice(-Math.min(yrs * 4, 20));
     var qOff = m.quarters.length - qs.length;
@@ -510,7 +453,6 @@
       { l: '最新營業利益率', v: L ? fmt(mg(L, 'op'), 1) + '%' : '–', s: L ? L.key : '', c: '#0ea5e9' },
       { l: '本益比 Z-score', v: st ? (st.z > 0 ? '+' : '') + fmt(st.z, 2) + 'σ' : '–', s: st ? '均值 ' + fmt(st.mean, 1) + 'x · σ ' + fmt(st.sd, 1) : '樣本不足(<12個月)', c: st ? zc(st.z) : '#64748b' }
     ];
-    neutralCards(cards, [6, 9]);
     $('#sd-cards').innerHTML = cards.map(function (c) {
       return '<div class="sd-card"><div class="l">' + c.l + '</div><div class="v" style="color:' + c.c + '">' + c.v + '</div><div class="s">' + c.s + '</div></div>';
     }).join('');
@@ -522,7 +464,7 @@
       var mult = bandMultiples(pes, mode);
       var ds = mult.map(function (x, i) {
         return { label: x + '倍', data: river.map(function (r) { return r.ttm > 0 ? +(x * r.ttm).toFixed(2) : null; }),
-          borderColor: rgba(T.ac, [0.3, 0.42, 0.54, 0.66, 0.8, 0.95][i]), backgroundColor: rgba(T.ac, [0, 0.05, 0.09, 0.13, 0.17, 0.22][i]), borderWidth: 1, pointRadius: 0, tension: 0.25, fill: i === 0 ? false : '-1', spanGaps: true };
+          borderColor: BC[i], backgroundColor: BF[i], borderWidth: 1, pointRadius: 0, tension: 0.25, fill: i === 0 ? false : '-1', spanGaps: true };
       });
       ds.push({ label: '月收盤價', data: river.map(function (r) { return r.close; }), borderColor: '#ffffff', borderWidth: 2.5,
         pointRadius: river.length <= 24 ? 3 : 0, tension: 0.2, fill: false });
@@ -546,7 +488,7 @@
         return { label: label, data: qs.map(function (q) { var x = mg(q, k); return x == null ? null : +x.toFixed(2); }), borderColor: col, borderWidth: 2, pointRadius: 3, tension: 0.2 };
       }
       mk('c-margin', { type: 'line', data: { labels: qs.map(function (q) { return q.key; }), datasets: [
-        line('毛利率', 'gp', T.ac), line('營業利益率', 'op', T.tx), line('稅前淨利率', 'pt', T.mu), line('稅後淨利率', 'ni', T.warn)
+        line('毛利率', 'gp', '#38bdf8'), line('營業利益率', 'op', '#a3e635'), line('稅前淨利率', 'pt', '#facc15'), line('稅後淨利率', 'ni', '#f97316')
       ] }, options: baseOpts() });
 
       var rows = qs.slice(-8).reverse();
@@ -681,31 +623,7 @@
     }
   };
 
-  var fsCode = null, fsYear = null, fsSeen = null, fsMsg = '', fsListN = 0;
-  function fillFsList() {
-    var codes = Object.keys(FACTSET);
-    if (codes.length === fsListN) return;
-    fsListN = codes.length;
-    $('#fs-list').innerHTML = codes.map(function (c) { return '<option value="' + c + ' ' + (FACTSET[c].name || '') + '"></option>'; }).join('');
-  }
-  function fsFind(q) {
-    q = (q || '').trim();
-    if (!q) return null;
-    var m = q.match(/^(\d{4,6}[A-Za-z]?)/);
-    if (m) return { code: m[1].toUpperCase(), hit: !!FACTSET[m[1].toUpperCase()] };
-    var codes = Object.keys(FACTSET);
-    var ex = codes.filter(function (c) { return FACTSET[c].name === q; })[0] || codes.filter(function (c) { return (FACTSET[c].name || '').indexOf(q) >= 0; })[0];
-    return ex ? { code: ex, hit: true } : { code: q, hit: false };
-  }
-  function fsSearch() {
-    var inp = $('#fs-q'), r = fsFind(inp.value);
-    if (!r) return;
-    if (r.hit) { fsCode = r.code; fsMsg = ''; inp.value = ''; inp.blur(); }
-    else fsMsg = '找不到「' + r.code + '」的 FactSet 調查資料，FactSet 主要涵蓋中大型股。';
-    renderFS();
-  }
-  $('#fs-go').addEventListener('click', fsSearch);
-  $('#fs-q').addEventListener('keydown', function (e) { if (e.key === 'Enter') fsSearch(); });
+  var fsCode = null, fsYear = null, fsSeen = null;
 
   function median(a) {
     var s = a.slice().sort(function (x, y) { return x - y; }), h = Math.floor(s.length / 2);
@@ -730,24 +648,22 @@
   function f2(x) { return fmt(x, 2); }
 
   function renderFS() {
-    readT();
     var panel = $('#p-fs'), codes = Object.keys(FACTSET);
     if (!codes.length) { panel.hidden = true; return; }
     panel.hidden = false;
-    if (model && model.code !== fsSeen) { fsSeen = model.code; if (FACTSET[model.code]) { fsCode = model.code; fsMsg = ''; } }
+    if (model && model.code !== fsSeen) { fsSeen = model.code; if (FACTSET[model.code]) fsCode = model.code; }
     if (!fsCode || !FACTSET[fsCode]) fsCode = codes[0];
 
     var d = FACTSET[fsCode], sv = d.surveys, last = sv[sv.length - 1];
     var ys = Object.keys(last.years).sort();
     if (!fsYear || ys.indexOf(String(fsYear)) < 0) fsYear = ys[0];
 
-    fillFsList();
     $('#fs-tabs').innerHTML =
+      '<select id="fs-pick">' + codes.map(function (c) { return '<option value="' + c + '"' + (c === fsCode ? ' selected' : '') + '>' + c + ' ' + FACTSET[c].name + '</option>'; }).join('') + '</select>' +
       ys.map(function (y) { return '<button type="button" data-y="' + y + '" class="' + (String(y) === String(fsYear) ? 'on' : '') + '">' + y + ' 年EPS</button>'; }).join('');
 
-    var note = fsCode + ' ' + d.name + ' · 最新調查 ' + (last.approx ? '≈' : '') + last.date + '，' + last.n + ' 位分析師 · 已收錄 ' + codes.length + ' 檔';
-    $('#fs-note').classList.toggle('err', !!fsMsg);
-    if (fsMsg) note = fsMsg + ' 目前顯示 ' + fsCode + ' ' + d.name + '。';
+    var note = '最新調查：' + (last.approx ? '≈' : '') + last.date + '，共 ' + last.n + ' 位分析師。';
+    if (model && model.code !== fsCode) note = '主畫面目前是 ' + model.code + (model.name ? ' ' + model.name : '') + '（尚無 FactSet 資料），本區塊顯示 ' + fsCode + ' ' + d.name + '。' + note;
     $('#fs-note').textContent = note;
 
     var live = model && model.code === fsCode && model.src !== 'sample';
@@ -770,7 +686,6 @@
       { l: '偏態指標', v: st.skew != null ? (st.skew >= 0 ? '+' : '') + f2(st.skew) : '–', s: '(平均−中位)÷σ̂', c: '#a78bfa' },
       { l: '共識σ（實測）', v: ms && ms.sd != null ? f2(ms.sd) : '–', s: ms ? '中位數於 ' + ms.n + ' 次調查間' : '', c: '#38bdf8' }
     ];
-    neutralCards(cards, []);
     $('#fs-cards').innerHTML = cards.map(function (c) {
       return '<div class="sd-card"><div class="l">' + c.l + '</div><div class="v" style="color:' + c.c + '">' + c.v + '</div><div class="s">' + c.s + '</div></div>';
     }).join('');
@@ -807,8 +722,8 @@
     var rt = d.rating;
     if (rt) {
       mk('c-fs-rate', { type: 'doughnut', data: { labels: ['積極樂觀 ' + rt.bull + ' 位', '保持中立 ' + rt.neutral + ' 位', '保守悲觀 ' + rt.bear + ' 位'],
-        datasets: [{ data: [rt.bull, rt.neutral, rt.bear], backgroundColor: [T.ac, T.mu2, T.warn], borderColor: T.pn, borderWidth: 2 }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: isMobile() ? 'bottom' : 'right', labels: { color: '#94a3b8', boxWidth: isMobile() ? 8 : 12, font: { size: isMobile() ? 10 : 11 } } } } } });
+        datasets: [{ data: [rt.bull, rt.neutral, rt.bear], backgroundColor: ['#22c55e', '#eab308', '#ef4444'], borderColor: '#0a0f1e', borderWidth: 2 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: '#94a3b8', font: { size: 11 } } } } } });
     } else if (charts['c-fs-rate']) { charts['c-fs-rate'].destroy(); delete charts['c-fs-rate']; }
 
     /* 表格 */
@@ -865,12 +780,15 @@
         (tl && tl.med != null ? '；目標價中位數對應 ' + ys[0] + ' 年 ' + fmt(tl.med / e0.med, 1) + ' 倍' : '') + '。');
     }
     if (rt) ins.push('評級（' + rt.date + '，' + rt.n + ' 位）：積極樂觀 ' + rt.bull + '、保持中立 ' + rt.neutral + '、保守悲觀 ' + rt.bear + '。');
-    if ($('#fs-ins')) $('#fs-ins').innerHTML = ins.map(function (x) { return '<li>' + x + '</li>'; }).join('');
+    $('#fs-ins').innerHTML = ins.map(function (x) { return '<li>' + x + '</li>'; }).join('');
   }
 
   $('#fs-tabs').addEventListener('click', function (e) {
     var b = e.target.closest('button[data-y]'); if (!b) return;
     fsYear = b.getAttribute('data-y'); renderFS();
+  });
+  $('#fs-tabs').addEventListener('change', function (e) {
+    if (e.target.id === 'fs-pick') { fsCode = e.target.value; renderFS(); }
   });
   fetch('data/factset.json').then(function (r) { if (!r.ok) throw new Error('none'); return r.json(); })
     .then(function (obj) { Object.keys(obj).forEach(function (k) { FACTSET[k] = obj[k]; }); if (model) renderFS(); })
@@ -950,28 +868,16 @@
   $('#sd-token').addEventListener('change', function () { token = this.value.trim(); });
 
   if (typeof Chart !== 'undefined') {
-    readT();
-    Chart.defaults.color = T.mu;
-    Chart.defaults.borderColor = T.grid;
+    Chart.defaults.color = '#94a3b8';
+    Chart.defaults.borderColor = '#1e293b';
     Chart.defaults.font.family = "'Noto Sans TC','Microsoft JhengHei',system-ui,sans-serif";
   } else {
     status('圖表函式庫（Chart.js）載入失敗，請確認網站允許載入 cdnjs.cloudflare.com 的腳本。', 'err');
   }
 
-  /* 視窗跨過手機／桌面寬度時重畫，讓圖表套用對應的字級與刻度 */
-  var lastMob = isMobile(), rzT = null;
-  window.addEventListener('resize', function () {
-    clearTimeout(rzT);
-    rzT = setTimeout(function () { var m = isMobile(); if (m !== lastMob) { lastMob = m; render(); } }, 200);
-  });
-
-  /* 系統切換深淺色時重畫 */
-  if (window.matchMedia) { var mq = window.matchMedia('(prefers-color-scheme: light)'); var rr = function () { readT(); render(); }; if (mq.addEventListener) mq.addEventListener('change', rr); else if (mq.addListener) mq.addListener(rr); }
-
   /* 啟動：先載入股票清單，再預設查 2330 */
   loadList().then(function () { return load({ id: '2330', name: '台積電' }); });
 })();
 </script>
-
-
-</body></html>
+</body>
+</html>

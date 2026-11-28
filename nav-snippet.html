@@ -1,0 +1,17 @@
+<!-- 貼在你自己（較新）個股頁的 <body> 開頭；樣式可放進 <style> -->
+<style>
+.site-nav{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:10px 18px;background:rgba(6,10,18,.9);backdrop-filter:blur(8px);border-bottom:1px solid #1b2740}
+.site-nav .brand{display:flex;align-items:center;gap:8px;font-weight:800;color:#e6edf7;text-decoration:none;font-size:15px}
+.site-nav .brand i{width:12px;height:12px;border-radius:50%;background:linear-gradient(120deg,#2563eb,#38bdf8 45%,#f97316);display:inline-block}
+.site-nav nav{display:flex;gap:4px;flex-wrap:wrap}
+.site-nav nav a{color:#7c8aa5;text-decoration:none;font-size:13px;font-weight:600;padding:7px 14px;border-radius:8px;border:1px solid transparent}
+.site-nav nav a.active{color:#fff;background:linear-gradient(#0f1729,#0f1729) padding-box,linear-gradient(120deg,#2563eb,#38bdf8 45%,#f97316) border-box}
+</style>
+<header class="site-nav">
+  <a class="brand" href="index.html"><i></i>投資儀表板</a>
+  <nav>
+    <a href="index.html">S&amp;P 500 預估估值</a>
+    <a href="taiex.html">台股大盤本益比</a>
+    <a href="stock.html" class="active">個股儀表板</a>
+  </nav>
+</header>
