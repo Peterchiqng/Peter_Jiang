@@ -1,3 +1,9 @@
+<!doctype html>
+<html lang="zh-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>body{margin:0}</style>
 
 <title>投資儀表板</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -70,6 +76,8 @@ html,body{background:#F3F8FC}
 nav.jump{top:58px !important}
 @media (max-width:600px){.site-nav .brand span.t{display:none}.site-nav nav{flex:1}.site-nav nav a{padding:7px 10px;flex:1;text-align:center}}
 </style>
+</head>
+<body>
 <header class="site-nav">
   <a class="brand" href="index.html"><span class="mk"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4.5 6h2l1.8 8h7.4l1.6-5.5H7.5" fill="none" stroke="#FF9F55" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="10" cy="17.5" r="1.2" fill="#FF9F55"/><circle cx="15" cy="17.5" r="1.2" fill="#FF9F55"/></svg></span><span class="t">投資儀表板</span></a>
   <nav>
@@ -104,6 +112,11 @@ nav.jump{top:58px !important}
     <div class="cv sm"><canvas id="cDual"></canvas></div>
   </section>
 
+  <section class="panel" id="secAnnual" hidden>
+    <h2>年度每股盈餘：實際與預估 <small id="annSub"></small></h2>
+    <div class="cv sm"><canvas id="cAnn"></canvas></div>
+  </section>
+
   <section class="panel">
     <h2 id="tblTitle"></h2>
     <div class="tw"><table id="tbl"></table></div>
@@ -122,13 +135,18 @@ nav.jump{top:58px !important}
 (function () {
   'use strict';
   var PERIODS = [{ key: '1y', n: 1, label: '1年', c: '#7C6BD6' }, { key: '2y', n: 2, label: '2年', c: '#3B6FD9' }, { key: '3y', n: 3, label: '3年', c: '#2A82B8' }, { key: '5y', n: 5, label: '5年', c: '#12A06A' }, { key: '10y', n: 10, label: '10年', c: '#F5852F' }];
-  var METRICS = [
+  var BASE_METRICS = [
     { key: 'fpe', label: '預估本益比（未來12個月）', unit: 'x', color: '#2A82B8', desc: 'WSJ / Birinyi 共識 · 觀測值' },
     { key: 'feps', label: '預估EPS（未來12個月）', unit: '$', color: '#12A06A', desc: '= 指數 ÷ 預估本益比' },
     { key: 'tpe', label: '近四季本益比', unit: 'x', color: '#F5852F', desc: 'WSJ 公布之 trailing PE' }
   ];
+  var EXTRA_METRICS = [
+    { key: 'ttm', label: '實際EPS（近四季）', unit: '$', color: '#D96F1F', desc: 'S&P 官方營業 EPS · 近四季加總' },
+    { key: 'opPE', label: '營業本益比（實際EPS）', unit: 'x', color: '#7C6BD6', desc: '指數 ÷ S&P 官方近四季營業 EPS' }
+  ];
+  var METRICS = BASE_METRICS.slice();
   var state = { metric: 'fpe', period: '5y' };
-  var R = [], META = {};
+  var R = [], META = {}, EPS = null;
 
   function $(s) { return document.querySelector(s); }
   function stats(a) {
@@ -142,6 +160,7 @@ nav.jump{top:58px !important}
   function sgn(z) { return (z > 0 ? '+' : '') + z.toFixed(2) + 'σ'; }
   function pct(a, b) { var d = (a / b - 1) * 100; return (d > 0 ? '+' : '') + d.toFixed(1) + '%'; }
   function qual(z) { if (z == null) return '–'; var a = Math.abs(z); return a >= 2 ? (z > 0 ? '顯著高估' : '顯著低估') : a >= 1 ? (z > 0 ? '偏高' : '偏低') : '接近均值'; }
+  function addDays(ds, n) { var d = new Date(ds + 'T00:00:00'); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10); }
   function addYears(ds, n) { var d = new Date(ds + 'T00:00:00'); d.setFullYear(d.getFullYear() - n); return d.toISOString().slice(0, 10); }
   var charts = {};
   function mk(id, cfg) { if (typeof Chart === 'undefined') return; if (charts[id]) charts[id].destroy(); charts[id] = new Chart(document.getElementById(id), cfg); }
@@ -161,6 +180,16 @@ nav.jump{top:58px !important}
   function build(res) {
     var fw = res.t.fw;
     R = fw.d.map(function (d, i) { return { d: d, px: fw.px[i], fpe: fw.fpe[i], feps: fw.feps[i], tpe: fw.tpe[i] }; });
+    METRICS = BASE_METRICS.slice();
+    if (EPS && EPS.ttm && EPS.ttm.length) {
+      var act = EPS.ttm.filter(function (x) { return !x.est && x.op != null; });
+      R.forEach(function (r) {
+        var cut = addDays(r.d, -40), best = null;
+        act.forEach(function (x) { if (x.d <= cut) best = x; });
+        r.ttm = best ? best.op : null; r.opPE = best ? +(r.px / best.op).toFixed(2) : null;
+      });
+      if (R.some(function (r) { return r.ttm != null; })) METRICS = BASE_METRICS.concat(EXTRA_METRICS);
+    }
     META = { upd: res.upd, src: res.src, n: R.length, first: R[0].d, last: R[R.length - 1].d };
     $('#stampTxt').textContent = '更新 ' + (META.upd || '') + ' · 最新觀測 ' + META.last + ' · WSJ';
     $('#srcNote').innerHTML = '資料說明：預估本益比（未來 12 個月）與近四季本益比來自 WSJ「P/Es &amp; Yields on Major Indexes」（預估由 Birinyi Associates 提供，為營業盈餘）；2013 年起的歷史由 Wayback Machine 的每月快照回補，共 ' + META.n + ' 個觀測點，間隔不一定相等（約每 1–2 個月一筆），標準差即以這些觀測值計算。預估EPS = 指數收盤 ÷ 預估本益比。數值與 FactSet 週報（約 12 個月預估 EPS、5 年／10 年均值）不完全相同，因為盈餘定義與預估期間不同。資料由 GitHub Actions 每個交易日自動更新（來源檔 ' + META.src + '）。本頁僅供資訊參考，不構成投資建議。';
@@ -171,13 +200,14 @@ nav.jump{top:58px !important}
     $('#periodTabs').innerHTML = PERIODS.map(function (p) { var on = p.key === state.period; return '<button type="button" class="tab' + (on ? ' on' : '') + '" data-k="period:' + p.key + '">近' + p.label + '</button>'; }).join('');
   }
   function rowsFor(p) { var cut = addYears(META.last, p.n); return R.filter(function (d) { return d.d >= cut; }); }
-  function histStats(m, p) { var rows = rowsFor(p); return stats(rows.slice(0, -1).map(function (d) { return d[m.key]; })); }
+  function histStats(m, p) { var rows = rowsFor(p).filter(function (d) { return d[m.key] != null; }); return stats(rows.slice(0, -1).map(function (d) { return d[m.key]; })); }
 
   function render() {
     renderTabs();
     var m = METRICS.filter(function (x) { return x.key === state.metric; })[0];
     var p = PERIODS.filter(function (x) { return x.key === state.period; })[0];
-    var rows = rowsFor(p), cur = R[R.length - 1][m.key];
+    var rows = rowsFor(p).filter(function (d) { return d[m.key] != null; }), cur = R[R.length - 1][m.key];
+    if (state.metric !== m.key) state.metric = m.key;
     var st = stats(rows.map(function (d) { return d[m.key]; }));
     var z = st.std > 0 ? (cur - st.mean) / st.std : null;
     $('#warn').textContent = st.n < 8 ? '提醒：近' + p.label + '只有 ' + st.n + ' 個觀測值，標準差與 Z-score 的參考性有限。' : '';
@@ -208,13 +238,26 @@ nav.jump{top:58px !important}
     $('#tblTitle').innerHTML = m.label + ' — 五段時間統計 <small>最新值 ' + fv(m, cur) + '</small>';
     var h = '<tr><th>時間段</th><th>n</th><th>均值</th><th>σ</th><th>-2σ</th><th>-1σ</th><th>+1σ</th><th>+2σ</th><th>Z-score</th><th>定性</th></tr>';
     h += PERIODS.map(function (pp) {
-      var s = stats(rowsFor(pp).map(function (d) { return d[m.key]; })), zz = s.std > 0 ? (cur - s.mean) / s.std : null, ok = s.n > 1;
+      var s = stats(rowsFor(pp).filter(function (d) { return d[m.key] != null; }).map(function (d) { return d[m.key]; })), zz = s.std > 0 ? (cur - s.mean) / s.std : null, ok = s.n > 1;
       var cells = [-2, -1, 1, 2].map(function (k) { return '<td>' + (ok ? fv(m, s.mean + k * s.std) : '–') + '</td>'; }).join('');
       return '<tr style="' + (pp.key === state.period ? 'background:' + pp.c + '14' : '') + '"><td style="color:' + pp.c + ';font-weight:700">近' + pp.label + '</td><td>' + s.n + '</td><td style="color:' + pp.c + '">' + fv(m, s.mean) + '</td><td>' + (ok ? fv(m, s.std) : '–') + '</td>' + cells +
         '<td style="color:' + (zz != null ? zColor(zz) : '#6A8399') + ';font-weight:800">' + (zz != null ? sgn(zz) : '–') + '</td><td style="color:' + (zz != null ? zColor(zz) : '#6A8399') + '">' + qual(zz) + '</td></tr>';
     }).join('');
     $('#tbl').innerHTML = h;
     renderInsights();
+    renderAnnual();
+  }
+
+  function renderAnnual() {
+    var sec = $('#secAnnual');
+    if (!EPS || !EPS.annual || !Object.keys(EPS.annual).length) { sec.hidden = true; return; }
+    var ys = Object.keys(EPS.annual).sort().filter(function (y) { return EPS.annual[y].op != null && +y >= new Date().getFullYear() - 9; });
+    if (!ys.length) { sec.hidden = true; return; }
+    sec.hidden = false;
+    $('#annSub').textContent = '營業EPS · 實際 vs 預估 · 資料更新 ' + (EPS.updated || '');
+    mk('cAnn', { type: 'bar', data: { labels: ys.map(function (y) { return EPS.annual[y].est ? y + 'E' : y; }), datasets: [
+      { label: '營業EPS', data: ys.map(function (y) { return EPS.annual[y].op; }), backgroundColor: ys.map(function (y) { return EPS.annual[y].est ? 'rgba(245,133,47,.35)' : 'rgba(42,130,184,.55)'; }), borderColor: ys.map(function (y) { return EPS.annual[y].est ? '#F5852F' : '#2A82B8'; }), borderWidth: 1 },
+      { label: 'As Reported EPS', data: ys.map(function (y) { return EPS.annual[y].rep; }), backgroundColor: 'rgba(18,160,106,.25)', borderColor: '#12A06A', borderWidth: 1 }] }, options: opts({ scales: { y: { beginAtZero: true, ticks: { color: '#6A8399', font: { size: 10 }, callback: function (v) { return '$' + v; } }, grid: { color: '#E1ECF4' } } } }) });
   }
 
   function nearest(date) { var best = R[0]; R.forEach(function (d) { if (d.d <= date) best = d; }); return best; }
@@ -235,9 +278,15 @@ nav.jump{top:58px !important}
 
   document.addEventListener('click', function (e) { var b = e.target.closest('button[data-k]'); if (!b) return; var kv = b.getAttribute('data-k').split(':'); state[kv[0]] = kv[1]; render(); });
   if (typeof Chart !== 'undefined') { Chart.defaults.color = '#36536B'; Chart.defaults.borderColor = '#E1ECF4'; }
-  load().then(function (res) { build(res); render(); }).catch(function (e) {
+  function loadEps() {
+    return tryFetch('market/data/spx_eps.json').catch(function () { return tryFetch('data/spx_eps.json'); })
+      .then(function (d) { return (d && d.ttm && d.ttm.length) ? d : null; }).catch(function () { return null; });
+  }
+  load().then(function (res) { return loadEps().then(function (e) { EPS = e; build(res); render(); }); }).catch(function (e) {
     $('#stampTxt').textContent = '資料載入失敗';
     $('#warn').textContent = '讀不到 market/data/market.json（或 data/spx.json）。請確認 GitHub Actions 的「大盤估值資料更新」已成功執行。錯誤：' + e.message;
   });
 })();
 </script>
+</body>
+</html>

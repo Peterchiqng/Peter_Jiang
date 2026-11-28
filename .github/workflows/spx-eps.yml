@@ -1,0 +1,35 @@
+name: S&P 500 官方 EPS 更新
+
+on:
+  schedule:
+    - cron: "20 22 * * 0-4"   # 台灣時間週一至週五 06:20
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: data-commit
+  cancel-in-progress: false
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install openpyxl
+      - name: 下載 S&P DJI 盈餘與預估 Excel
+        run: python scripts/spx_eps_crawl.py
+      - name: 提交資料
+        run: |
+          git add market/data/spx_eps.json
+          if git diff --cached --quiet; then echo "資料沒有變動"; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898332+github-actions[bot]@users.noreply.github.com"
+          git commit -m "更新 S&P 500 官方 EPS"
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push
