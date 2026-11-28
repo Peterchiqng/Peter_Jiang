@@ -5,24 +5,31 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>個股投資儀表板</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@500;600;700;800&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
-<style>html,body{margin:0;background:#030712}body{padding:0}
-:root{--grad:linear-gradient(120deg,#2563eb 0%,#38bdf8 45%,#f97316 100%)}
-.site-nav{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:10px 18px;background:rgba(6,10,18,.9);backdrop-filter:blur(8px);border-bottom:1px solid #1b2740;font-family:'Noto Sans TC','Microsoft JhengHei',system-ui,sans-serif}
-.site-nav .brand{display:flex;align-items:center;gap:8px;font-weight:800;color:#e6edf7;text-decoration:none;font-size:15px}
-.site-nav .brand i{width:12px;height:12px;border-radius:50%;background:var(--grad);display:inline-block}
-.site-nav nav{display:flex;gap:4px;flex-wrap:wrap}
-.site-nav nav a{color:#7c8aa5;text-decoration:none;font-size:13px;font-weight:600;padding:7px 14px;border-radius:8px;border:1px solid transparent}
-.site-nav nav a:hover{color:#e6edf7;border-color:#1b2740}
-.site-nav nav a.active{color:#fff;background:linear-gradient(#0f1729,#0f1729) padding-box,var(--grad) border-box}
+<style>html,body{margin:0;background:#F3F8FC}body{padding:0}
+:root{--grad:linear-gradient(120deg,#2563eb 0%,#2A82B8 45%,#F5852F 100%)}
 #sd-root{padding:14px 12px}
 #sd-root h1{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
-#sd-root h1 small{-webkit-text-fill-color:#64748b}</style>
+#sd-root h1 small{-webkit-text-fill-color:#6A8399}</style>
 </head>
 <body>
+<style>
+html,body{background:#F3F8FC}
+.site-nav{position:sticky;top:0;z-index:60;display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:10px 20px;background:rgba(255,255,255,.88);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-bottom:1px solid #E1ECF4;font-family:'Nunito','Noto Sans TC','Microsoft JhengHei',system-ui,sans-serif}
+.site-nav .brand{display:inline-flex;align-items:center;gap:9px;font-family:'Fredoka','Nunito',sans-serif;font-weight:600;font-size:18px;color:#3B95C4;text-decoration:none;white-space:nowrap}
+.site-nav .brand .mk{width:32px;height:32px;border-radius:50%;background:#fff;box-shadow:0 0 0 1px #E1ECF4,0 2px 6px rgba(22,50,74,.10);display:inline-flex;align-items:center;justify-content:center}
+.site-nav nav{display:flex;gap:4px;flex-wrap:wrap;background:#F7FBFE;border:1px solid #E1ECF4;border-radius:999px;padding:4px}
+.site-nav nav a{color:#6A8399;text-decoration:none;font-size:13.5px;font-weight:700;padding:7px 16px;border-radius:999px;border:0;white-space:nowrap}
+.site-nav nav a:hover{color:#16324A;border:0}
+.site-nav nav a.active{color:#fff;background:linear-gradient(90deg,#5FB4E2 0%,#3B95C4 55%,#2A82B8 100%);box-shadow:0 2px 8px rgba(42,130,184,.30);border:0}
+nav.jump{top:58px !important}
+@media (max-width:600px){.site-nav .brand span.t{display:none}.site-nav nav{flex:1}.site-nav nav a{padding:7px 10px;flex:1;text-align:center}}
+</style>
 <header class="site-nav">
-  <a class="brand" href="index.html"><i></i>投資儀表板</a>
+  <a class="brand" href="index.html"><span class="mk"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4.5 6h2l1.8 8h7.4l1.6-5.5H7.5" fill="none" stroke="#FF9F55" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="10" cy="17.5" r="1.2" fill="#FF9F55"/><circle cx="15" cy="17.5" r="1.2" fill="#FF9F55"/></svg></span><span class="t">投資儀表板</span></a>
   <nav>
+    <a href="daily.html">每日股市</a>
     <a href="index.html">S&amp;P 500 預估估值</a>
     <a href="taiex.html">台股大盤本益比</a>
     <a href="stock.html" class="active">個股儀表板</a>
@@ -31,7 +38,7 @@
 <div id="sd-root">
   <div class="sd-head">
     <div>
-      <h1>個股投資儀表板 <small style="font-size:12px;color:#64748b;font-weight:400">v4</small></h1>
+      <h1>個股投資儀表板 <small style="font-size:12px;color:#6A8399;font-weight:400">v4</small></h1>
       <p class="sd-sub">本益比河流圖 · 月營收 · 利潤率 · EPS · 損益表 · 標準差分析</p>
     </div>
     <span id="sd-src" class="sd-badge">尚未載入</span>
@@ -94,13 +101,13 @@
 
   <style>
   #sd-root .fs-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 10px;align-items:center}
-  #sd-root .fs-tabs button{background:transparent;color:#94a3b8;border:1px solid var(--ln);padding:5px 14px;font-size:12px;font-weight:600;border-radius:8px}
+  #sd-root .fs-tabs button{background:transparent;color:#36536B;border:1px solid var(--ln);padding:5px 14px;font-size:12px;font-weight:600;border-radius:8px}
   #sd-root .fs-tabs button:hover{border-color:var(--ac);color:var(--ac)}
-  #sd-root .fs-tabs button.on{border-color:var(--ac);color:var(--ac);background:#38bdf822}
+  #sd-root .fs-tabs button.on{border-color:var(--ac);color:var(--ac);background:#2A82B822}
   #sd-root .fs-tabs select{width:auto;padding:6px 10px;font-size:12px}
-  #sd-root h3{font-size:12px;font-weight:600;color:#94a3b8;margin:4px 0 6px}
-  #sd-root .fs-note{font-size:12px;color:#94a3b8;line-height:1.7;margin-bottom:8px}
-  #sd-root .fs-method{font-size:11px;color:#475569;line-height:1.8;margin:12px 0 0}
+  #sd-root h3{font-size:12px;font-weight:600;color:#36536B;margin:4px 0 6px}
+  #sd-root .fs-note{font-size:12px;color:#36536B;line-height:1.7;margin-bottom:8px}
+  #sd-root .fs-method{font-size:11px;color:#6A8399;line-height:1.8;margin:12px 0 0}
   #sd-root .fs-sub{margin-top:14px}
   </style>
   <div class="sd-panel" id="p-fs">
@@ -130,47 +137,47 @@
 </div>
 
 <style>
-#sd-root{--bg:#030712;--pn:#0a0f1e;--ln:#1e293b;--tx:#e2e8f0;--mu:#64748b;--ac:#38bdf8;--mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+#sd-root{--bg:#F3F8FC;--pn:#FFFFFF;--ln:#E1ECF4;--tx:#16324A;--mu:#6A8399;--ac:#2A82B8;--mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
   background:var(--bg);color:var(--tx);padding:20px 18px;border-radius:14px;font-family:'Noto Sans TC','Microsoft JhengHei',system-ui,sans-serif;max-width:1200px;margin:0 auto;box-sizing:border-box}
 #sd-root *{box-sizing:border-box}
 #sd-root h1{font-size:24px;font-weight:800;margin:0;letter-spacing:-.01em}
-#sd-root h2{font-size:14px;font-weight:700;margin:0 0 10px;color:#cbd5e1}
+#sd-root h2{font-size:14px;font-weight:700;margin:0 0 10px;color:#16324A}
 #sd-root h2 small{font-weight:400;color:var(--mu);margin-left:8px;font-size:11px}
 #sd-root .sd-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:14px}
 #sd-root .sd-sub{margin:4px 0 0;color:var(--mu);font-size:12px}
 #sd-root .sd-badge{font-size:11px;padding:4px 10px;border-radius:999px;border:1px solid var(--ln);color:var(--mu);white-space:nowrap}
-#sd-root .sd-badge.live{color:#22c55e;border-color:#166534;background:#052e16}
-#sd-root .sd-badge.sample{color:#facc15;border-color:#854d0e;background:#1c1405}
+#sd-root .sd-badge.live{color:#12A06A;border-color:#9BD8BC;background:#E4F6EE}
+#sd-root .sd-badge.sample{color:#B7791F;border-color:#F2D9A6;background:#FFF4DC}
 #sd-root .sd-search{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
 #sd-root .sd-inwrap{position:relative;flex:1 1 280px}
 #sd-root input[type=text],#sd-root input[type=password],#sd-root select{background:var(--pn);border:1px solid var(--ln);color:var(--tx);border-radius:8px;padding:10px 12px;font-size:14px;font-family:inherit;width:100%}
 #sd-root select{width:auto}
 #sd-root input:focus,#sd-root select:focus{outline:none;border-color:var(--ac)}
-#sd-root button{background:#0ea5e9;color:#00131f;border:0;border-radius:8px;padding:10px 20px;font-weight:700;cursor:pointer;font-size:14px}
-#sd-root button:hover{background:#38bdf8}
-#sd-root .sd-sugg{position:absolute;z-index:20;left:0;right:0;top:calc(100% + 4px);background:#0f172a;border:1px solid #334155;border-radius:8px;max-height:260px;overflow:auto}
+#sd-root button{background:#2A82B8;color:#FFFFFF;border:0;border-radius:8px;padding:10px 20px;font-weight:700;cursor:pointer;font-size:14px}
+#sd-root button:hover{background:#2A82B8}
+#sd-root .sd-sugg{position:absolute;z-index:20;left:0;right:0;top:calc(100% + 4px);background:#FFFFFF;border:1px solid #C9DCEA;border-radius:8px;max-height:260px;overflow:auto}
 #sd-root .sd-sugg div{padding:8px 12px;font-size:13px;cursor:pointer;display:flex;gap:10px}
-#sd-root .sd-sugg div:hover{background:#1e293b}
+#sd-root .sd-sugg div:hover{background:#E1ECF4}
 #sd-root .sd-sugg b{font-family:var(--mono);color:var(--ac);min-width:52px}
 #sd-root .sd-chips{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 4px}
-#sd-root .sd-chip{font-size:12px;padding:4px 10px;border:1px solid var(--ln);border-radius:999px;color:#94a3b8;cursor:pointer;background:transparent}
+#sd-root .sd-chip{font-size:12px;padding:4px 10px;border:1px solid var(--ln);border-radius:999px;color:#36536B;cursor:pointer;background:transparent}
 #sd-root .sd-chip:hover{border-color:var(--ac);color:var(--ac)}
 #sd-root .sd-token{margin:6px 0;font-size:12px;color:var(--mu)}
 #sd-root .sd-token summary{cursor:pointer}
 #sd-root .sd-token input{margin-top:6px;max-width:420px}
 #sd-root .sd-status{font-size:12px;margin:8px 0 14px;color:var(--mu);min-height:18px}
-#sd-root .sd-status.ok{color:#22c55e}
-#sd-root .sd-status.warn{color:#facc15}
-#sd-root .sd-status.err{color:#f87171}
+#sd-root .sd-status.ok{color:#12A06A}
+#sd-root .sd-status.warn{color:#B7791F}
+#sd-root .sd-status.err{color:#E5484D}
 #sd-root .sd-title{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:10px}
 #sd-root .sd-title .nm{font-size:22px;font-weight:800}
 #sd-root .sd-title .cd{font-family:var(--mono);color:var(--ac);font-size:16px}
 #sd-root .sd-title .px{font-family:var(--mono);font-size:22px;font-weight:700}
 #sd-root .sd-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:8px;margin-bottom:14px}
-#sd-root .sd-card{background:#0f172a;border:1px solid var(--ln);border-radius:10px;padding:10px 12px}
+#sd-root .sd-card{background:#FFFFFF;border:1px solid var(--ln);border-radius:10px;padding:10px 12px}
 #sd-root .sd-card .l{font-size:10px;color:var(--mu);margin-bottom:3px}
 #sd-root .sd-card .v{font-family:var(--mono);font-size:18px;font-weight:700;line-height:1.1}
-#sd-root .sd-card .s{font-size:10px;color:#475569;margin-top:3px}
+#sd-root .sd-card .s{font-size:10px;color:#6A8399;margin-top:3px}
 #sd-root .sd-panel{background:var(--pn);border:1px solid var(--ln);border-radius:12px;padding:14px 12px 10px;margin-bottom:14px}
 #sd-root .sd-panel[hidden]{display:none}
 #sd-root .sd-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
@@ -180,13 +187,43 @@
 #sd-root .sd-cv.sm{height:260px}
 #sd-root .sd-tblwrap{overflow-x:auto}
 #sd-root table{width:100%;border-collapse:collapse;font-size:12px}
-#sd-root th{color:var(--mu);font-weight:500;text-align:right;padding:7px 9px;border-bottom:1px solid var(--ln);white-space:nowrap;background:#0f172a}
-#sd-root td{text-align:right;padding:7px 9px;font-family:var(--mono);border-bottom:1px solid #0f172a;white-space:nowrap}
+#sd-root th{color:var(--mu);font-weight:500;text-align:right;padding:7px 9px;border-bottom:1px solid var(--ln);white-space:nowrap;background:#FFFFFF}
+#sd-root td{text-align:right;padding:7px 9px;font-family:var(--mono);border-bottom:1px solid #FFFFFF;white-space:nowrap}
 #sd-root th:first-child,#sd-root td:first-child{text-align:left}
-#sd-root .sd-ins{margin:0;padding-left:18px;font-size:13px;line-height:1.9;color:#cbd5e1}
-#sd-root .sd-foot{font-size:11px;color:#475569;line-height:1.8;margin:14px 0 0}
+#sd-root .sd-ins{margin:0;padding-left:18px;font-size:13px;line-height:1.9;color:#16324A}
+#sd-root .sd-foot{font-size:11px;color:#6A8399;line-height:1.8;margin:14px 0 0}
 </style>
 
+<style>
+body #sd-root{--bg:#F3F8FC;--pn:#FFFFFF;--cd:#F7FBFE;--ln:#E1ECF4;--ln2:#C9DCEA;--tx:#16324A;--tx2:#36536B;--mu:#6A8399;--mu2:#9AAFC0;--ac:#2A82B8;--acw:rgba(59,149,196,.12);--up:#E5484D;--dn:#12A06A;--warn:#F5852F;--grid:#EAF2F8;
+  --mono:'Nunito','Noto Sans TC',system-ui,sans-serif;--sh:0 1px 2px rgba(22,50,74,.05),0 8px 24px rgba(22,50,74,.07);
+  --j-g-brand:linear-gradient(125deg,#236C9A 0%,#2A82B8 28%,#3B95C4 55%,#62B6E0 78%,#FFB27A 100%);--j-g-orange:linear-gradient(135deg,#FFBE8A 0%,#FF9F55 55%,#F5852F 100%);--j-g-blue:linear-gradient(90deg,#5FB4E2 0%,#3B95C4 55%,#2A82B8 100%);
+  font-family:'Nunito','Noto Sans TC','Microsoft JhengHei',system-ui,sans-serif;font-variant-numeric:tabular-nums;border-radius:20px;-webkit-font-smoothing:antialiased}
+body #sd-root .sd-head{background:var(--j-g-brand);color:#fff;border-radius:22px;padding:22px 24px;box-shadow:0 10px 30px rgba(42,130,184,.25);align-items:center}
+body #sd-root h1{font-family:'Fredoka','Nunito',sans-serif;font-weight:600;font-size:27px;color:#fff;background:none;-webkit-text-fill-color:#fff}
+body #sd-root h1 small{color:rgba(255,255,255,.75)!important;-webkit-text-fill-color:rgba(255,255,255,.75)!important}
+body #sd-root .sd-sub{color:rgba(255,255,255,.9);font-weight:600}
+body #sd-root .sd-badge{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);color:#fff;font-weight:700}
+body #sd-root .sd-badge.live,body #sd-root .sd-badge.sample{background:rgba(255,255,255,.24);color:#fff;border-color:rgba(255,255,255,.45)}
+body #sd-root h2{font-family:'Fredoka','Nunito',sans-serif;font-weight:600;font-size:17px;color:var(--tx)}
+body #sd-root .sd-title .nm,body #sd-root .sd-title .px{font-family:'Fredoka','Nunito',sans-serif;font-weight:600}
+body #sd-root .sd-panel{border-radius:20px;border:1px solid var(--ln);box-shadow:var(--sh)}
+body #sd-root .sd-card{border-radius:16px;border:1px solid var(--ln);box-shadow:var(--sh)}
+body #sd-root .sd-panel .sd-card{box-shadow:none}
+body #sd-root .sd-card .v{font-family:'Fredoka','Nunito',sans-serif;font-weight:600}
+body #sd-root input[type=text],body #sd-root input[type=password],body #sd-root select{border-radius:12px;border:1.5px solid var(--ln);background:var(--cd);font-weight:600;color:var(--tx)}
+body #sd-root input:focus,body #sd-root select:focus{border-color:#3B95C4;box-shadow:0 0 0 4px var(--acw);background:#fff}
+body #sd-root button{background:var(--j-g-orange);color:#3A1E06;border-radius:999px;font-weight:800;box-shadow:0 4px 14px rgba(255,159,85,.40);padding:10px 22px}
+body #sd-root button:hover{background:var(--j-g-orange);filter:brightness(1.04)}
+body #sd-root .sd-chip{border-radius:999px;border:1.5px solid var(--ln);font-weight:700;color:var(--tx2);background:#fff;box-shadow:none;padding:5px 13px}
+body #sd-root .sd-chip:hover{border-color:#3B95C4;color:var(--ac);background:#fff}
+body #sd-root .fs-tabs button{border-radius:999px;font-weight:700;border:1.5px solid var(--ln);background:#fff;color:var(--tx2);box-shadow:none;padding:6px 14px}
+body #sd-root .fs-tabs button.on{background:var(--j-g-blue);color:#fff;border-color:transparent}
+body #sd-root .sd-sugg{border-radius:14px;box-shadow:var(--sh);background:#fff;border-color:var(--ln)}
+body #sd-root .sd-sugg div:hover{background:var(--cd)}
+body #sd-root th{font-weight:800}
+body #sd-root td{font-weight:600}
+</style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>
 (function () {
@@ -196,7 +233,7 @@
   var API = 'https://api.finmindtrade.com/api/v4/data';
   var UNIT = 1e8;                    // FinMind 金額單位(元) → 億元。若與CMoney數字相差1000倍，改成 1e5
   var LAG = { 1: 1, 2: 1, 3: 1, 4: 3 }; // 季報套用到河流圖的延遲月數（Q4年報較晚）
-  var BC = ['#22c55e', '#84cc16', '#eab308', '#f97316', '#ef4444', '#a855f7'];
+  var BC = ['#12A06A', '#12A06A', '#C99700', '#F5852F', '#E5484D', '#a855f7'];
   var BF = ['rgba(34,197,94,.12)', 'rgba(132,204,22,.12)', 'rgba(234,179,8,.12)', 'rgba(249,115,22,.13)', 'rgba(239,68,68,.13)', 'rgba(168,85,247,.13)'];
 
   var BUILTIN = [
@@ -245,7 +282,7 @@
     var s = a.slice().sort(function (x, y) { return x - y; }), p = (s.length - 1) * q, b = Math.floor(p);
     return s[b] + (s[Math.min(b + 1, s.length - 1)] - s[b]) * (p - b);
   }
-  function zc(z) { var a = Math.abs(z); return a >= 2 ? '#ef4444' : a >= 1 ? '#f97316' : a >= 0.5 ? '#eab308' : '#22c55e'; }
+  function zc(z) { var a = Math.abs(z); return a >= 2 ? '#E5484D' : a >= 1 ? '#F5852F' : a >= 0.5 ? '#C99700' : '#12A06A'; }
 
   var LIST = BUILTIN.slice(), model = null, token = '', charts = {};
 
@@ -401,10 +438,10 @@
   function baseOpts(extra) {
     var o = {
       responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
-      plugins: { legend: { labels: { color: '#94a3b8', boxWidth: 12, font: { size: 11 } } } },
+      plugins: { legend: { labels: { color: '#36536B', boxWidth: 12, font: { size: 11 } } } },
       scales: {
-        x: { ticks: { color: '#64748b', maxTicksLimit: 12, font: { size: 10 } }, grid: { display: false } },
-        y: { ticks: { color: '#64748b', font: { size: 10 } }, grid: { color: '#1e293b' } }
+        x: { ticks: { color: '#6A8399', maxTicksLimit: 12, font: { size: 10 } }, grid: { display: false } },
+        y: { ticks: { color: '#6A8399', font: { size: 10 } }, grid: { color: '#E1ECF4' } }
       }
     };
     if (extra) Object.keys(extra).forEach(function (k) { o.scales[k] = extra[k]; });
@@ -425,9 +462,9 @@
 
     $('#sd-title').innerHTML = '<span class="nm">' + (m.name || '') + '</span><span class="cd">' + m.code + '</span>' +
       '<span class="px">' + fmt(m.price.close, 2) + '</span>' +
-      '<span style="font-family:var(--mono);color:' + (m.price.chg >= 0 ? '#f87171' : '#4ade80') + '">' +
+      '<span style="font-family:var(--mono);color:' + (m.price.chg >= 0 ? '#E5484D' : '#12A06A') + '">' +
       (m.price.chg > 0 ? '▲ ' : m.price.chg < 0 ? '▼ ' : '') + fmt(Math.abs(m.price.chg), 2) + ' (' + pct(m.price.pct, 2) + ')</span>' +
-      '<span style="color:#475569;font-size:12px">' + m.price.date + '</span>';
+      '<span style="color:#6A8399;font-size:12px">' + m.price.date + '</span>';
 
     var qs = m.quarters.slice(-Math.min(yrs * 4, 20));
     var qOff = m.quarters.length - qs.length;
@@ -442,16 +479,16 @@
     var L = qs[qs.length - 1] || null, lm = mo[mo.length - 1] || null;
     function mg(q, k) { return q && q.rev ? q[k] / q.rev * 100 : null; }
     var cards = [
-      { l: '收盤價', v: fmt(m.price.close, 2), s: m.price.date, c: '#38bdf8' },
-      { l: '本益比（自算）', v: selfPE ? fmt(selfPE, 1) + 'x' : '–', s: '價 ÷ 近四季EPS', c: '#f97316' },
-      { l: '本益比（官方）', v: m.per ? fmt(m.per, 1) + 'x' : '–', s: 'TWSE/TPEx', c: '#fb923c' },
-      { l: '股價淨值比', v: m.pbr ? fmt(m.pbr, 2) + 'x' : '–', s: 'PBR', c: '#a78bfa' },
-      { l: '殖利率', v: m.dy != null ? fmt(m.dy, 2) + '%' : '–', s: '現金股利', c: '#22c55e' },
-      { l: '近四季EPS', v: m.ttmLatest != null ? fmt(m.ttmLatest, 2) : '–', s: L ? L.key : '', c: '#a3e635' },
-      { l: '最新月營收年增', v: lm ? pct(lm.yoy, 1) : '–', s: lm ? lm.ym : '', c: lm && lm.yoy > 0 ? '#f87171' : '#4ade80' },
-      { l: '最新毛利率', v: L ? fmt(mg(L, 'gp'), 1) + '%' : '–', s: L ? L.key : '', c: '#38bdf8' },
-      { l: '最新營業利益率', v: L ? fmt(mg(L, 'op'), 1) + '%' : '–', s: L ? L.key : '', c: '#0ea5e9' },
-      { l: '本益比 Z-score', v: st ? (st.z > 0 ? '+' : '') + fmt(st.z, 2) + 'σ' : '–', s: st ? '均值 ' + fmt(st.mean, 1) + 'x · σ ' + fmt(st.sd, 1) : '樣本不足(<12個月)', c: st ? zc(st.z) : '#64748b' }
+      { l: '收盤價', v: fmt(m.price.close, 2), s: m.price.date, c: '#2A82B8' },
+      { l: '本益比（自算）', v: selfPE ? fmt(selfPE, 1) + 'x' : '–', s: '價 ÷ 近四季EPS', c: '#F5852F' },
+      { l: '本益比（官方）', v: m.per ? fmt(m.per, 1) + 'x' : '–', s: 'TWSE/TPEx', c: '#F5852F' },
+      { l: '股價淨值比', v: m.pbr ? fmt(m.pbr, 2) + 'x' : '–', s: 'PBR', c: '#7C6BD6' },
+      { l: '殖利率', v: m.dy != null ? fmt(m.dy, 2) + '%' : '–', s: '現金股利', c: '#12A06A' },
+      { l: '近四季EPS', v: m.ttmLatest != null ? fmt(m.ttmLatest, 2) : '–', s: L ? L.key : '', c: '#12A06A' },
+      { l: '最新月營收年增', v: lm ? pct(lm.yoy, 1) : '–', s: lm ? lm.ym : '', c: lm && lm.yoy > 0 ? '#E5484D' : '#12A06A' },
+      { l: '最新毛利率', v: L ? fmt(mg(L, 'gp'), 1) + '%' : '–', s: L ? L.key : '', c: '#2A82B8' },
+      { l: '最新營業利益率', v: L ? fmt(mg(L, 'op'), 1) + '%' : '–', s: L ? L.key : '', c: '#2A82B8' },
+      { l: '本益比 Z-score', v: st ? (st.z > 0 ? '+' : '') + fmt(st.z, 2) + 'σ' : '–', s: st ? '均值 ' + fmt(st.mean, 1) + 'x · σ ' + fmt(st.sd, 1) : '樣本不足(<12個月)', c: st ? zc(st.z) : '#6A8399' }
     ];
     $('#sd-cards').innerHTML = cards.map(function (c) {
       return '<div class="sd-card"><div class="l">' + c.l + '</div><div class="v" style="color:' + c.c + '">' + c.v + '</div><div class="s">' + c.s + '</div></div>';
@@ -466,7 +503,7 @@
         return { label: x + '倍', data: river.map(function (r) { return r.ttm > 0 ? +(x * r.ttm).toFixed(2) : null; }),
           borderColor: BC[i], backgroundColor: BF[i], borderWidth: 1, pointRadius: 0, tension: 0.25, fill: i === 0 ? false : '-1', spanGaps: true };
       });
-      ds.push({ label: '月收盤價', data: river.map(function (r) { return r.close; }), borderColor: '#ffffff', borderWidth: 2.5,
+      ds.push({ label: '月收盤價', data: river.map(function (r) { return r.close; }), borderColor: '#16324A', borderWidth: 2.5,
         pointRadius: river.length <= 24 ? 3 : 0, tension: 0.2, fill: false });
       mk('c-river', { type: 'line', data: { labels: river.map(function (r) { return r.ym; }), datasets: ds }, options: baseOpts() });
     }
@@ -475,9 +512,9 @@
     show('p-rev', mo.length > 0);
     if (mo.length) {
       mk('c-rev', { data: { labels: mo.map(function (r) { return r.ym; }), datasets: [
-        { type: 'bar', label: '月營收(億)', data: mo.map(function (r) { return +r.rev.toFixed(1); }), backgroundColor: 'rgba(56,189,248,.45)', borderColor: '#38bdf8', borderWidth: 1, yAxisID: 'y' },
-        { type: 'line', label: '年增率%', data: mo.map(function (r) { return r.yoy == null ? null : +r.yoy.toFixed(2); }), borderColor: '#f97316', borderWidth: 2, pointRadius: 2, yAxisID: 'y1', tension: 0.2 }
-      ] }, options: baseOpts({ y1: { position: 'right', ticks: { color: '#f97316', font: { size: 10 } }, grid: { display: false } } }) });
+        { type: 'bar', label: '月營收(億)', data: mo.map(function (r) { return +r.rev.toFixed(1); }), backgroundColor: 'rgba(56,189,248,.45)', borderColor: '#2A82B8', borderWidth: 1, yAxisID: 'y' },
+        { type: 'line', label: '年增率%', data: mo.map(function (r) { return r.yoy == null ? null : +r.yoy.toFixed(2); }), borderColor: '#F5852F', borderWidth: 2, pointRadius: 2, yAxisID: 'y1', tension: 0.2 }
+      ] }, options: baseOpts({ y1: { position: 'right', ticks: { color: '#F5852F', font: { size: 10 } }, grid: { display: false } } }) });
     }
 
     /* 利潤率 */
@@ -488,7 +525,7 @@
         return { label: label, data: qs.map(function (q) { var x = mg(q, k); return x == null ? null : +x.toFixed(2); }), borderColor: col, borderWidth: 2, pointRadius: 3, tension: 0.2 };
       }
       mk('c-margin', { type: 'line', data: { labels: qs.map(function (q) { return q.key; }), datasets: [
-        line('毛利率', 'gp', '#38bdf8'), line('營業利益率', 'op', '#a3e635'), line('稅前淨利率', 'pt', '#facc15'), line('稅後淨利率', 'ni', '#f97316')
+        line('毛利率', 'gp', '#2A82B8'), line('營業利益率', 'op', '#12A06A'), line('稅前淨利率', 'pt', '#B7791F'), line('稅後淨利率', 'ni', '#F5852F')
       ] }, options: baseOpts() });
 
       var rows = qs.slice(-8).reverse();
@@ -503,9 +540,9 @@
     show('p-eps', qs.length > 0);
     if (qs.length) {
       mk('c-eps', { data: { labels: qs.map(function (q) { return q.key; }), datasets: [
-        { type: 'bar', label: '單季EPS', data: qs.map(function (q) { return q.eps; }), backgroundColor: 'rgba(163,230,53,.4)', borderColor: '#a3e635', borderWidth: 1, yAxisID: 'y' },
-        { type: 'line', label: '近四季EPS', data: ttmS.map(function (t) { return t == null ? null : +t.toFixed(2); }), borderColor: '#f97316', borderWidth: 2, pointRadius: 3, yAxisID: 'y1', tension: 0.2 }
-      ] }, options: baseOpts({ y1: { position: 'right', ticks: { color: '#f97316', font: { size: 10 } }, grid: { display: false } } }) });
+        { type: 'bar', label: '單季EPS', data: qs.map(function (q) { return q.eps; }), backgroundColor: 'rgba(163,230,53,.4)', borderColor: '#12A06A', borderWidth: 1, yAxisID: 'y' },
+        { type: 'line', label: '近四季EPS', data: ttmS.map(function (t) { return t == null ? null : +t.toFixed(2); }), borderColor: '#F5852F', borderWidth: 2, pointRadius: 3, yAxisID: 'y1', tension: 0.2 }
+      ] }, options: baseOpts({ y1: { position: 'right', ticks: { color: '#F5852F', font: { size: 10 } }, grid: { display: false } } }) });
     }
 
     /* PE 標準差帶 */
@@ -516,9 +553,9 @@
       var mu = mean(arr), s = arr.length > 1 ? sd(arr) : 0;
       function cst(label, val, col, dash) { return { label: label, data: arr.map(function () { return +val.toFixed(2); }), borderColor: col, borderWidth: 1, borderDash: dash || [5, 4], pointRadius: 0 }; }
       mk('c-pe', { type: 'line', data: { labels: peRows.map(function (r) { return r.ym; }), datasets: [
-        { label: '本益比', data: arr, borderColor: '#38bdf8', borderWidth: 2.2, pointRadius: arr.length <= 24 ? 3 : 0, tension: 0.2 },
-        cst('均值 ' + fmt(mu, 1), mu, '#ffffff', []),
-        cst('+1σ', mu + s, '#eab308'), cst('-1σ', mu - s, '#eab308'), cst('+2σ', mu + 2 * s, '#ef4444'), cst('-2σ', mu - 2 * s, '#22c55e')
+        { label: '本益比', data: arr, borderColor: '#2A82B8', borderWidth: 2.2, pointRadius: arr.length <= 24 ? 3 : 0, tension: 0.2 },
+        cst('均值 ' + fmt(mu, 1), mu, '#16324A', []),
+        cst('+1σ', mu + s, '#C99700'), cst('-1σ', mu - s, '#C99700'), cst('+2σ', mu + 2 * s, '#E5484D'), cst('-2σ', mu - 2 * s, '#12A06A')
       ] }, options: baseOpts() });
     }
 
@@ -644,7 +681,7 @@
     return { n: arr.length, mean: mean(arr), med: median(arr), sd: arr.length > 1 ? sd(arr) : null,
       min: Math.min.apply(null, arr), max: Math.max.apply(null, arr), first: arr[0], last: arr[arr.length - 1] };
   }
-  function fsY() { return { y: { beginAtZero: false, ticks: { color: '#64748b', font: { size: 10 } }, grid: { color: '#1e293b' } } }; }
+  function fsY() { return { y: { beginAtZero: false, ticks: { color: '#6A8399', font: { size: 10 } }, grid: { color: '#E1ECF4' } } }; }
   function f2(x) { return fmt(x, 2); }
 
   function renderFS() {
@@ -675,16 +712,16 @@
     var ms = serStat(medSer);
 
     var cards = [
-      { l: '分析師家數', v: last.n + ' 位', s: (last.approx ? '≈' : '') + last.date, c: '#94a3b8' },
-      { l: '平均數', v: f2(st.mean), s: fsYear + ' 年EPS（FactSet公布）', c: '#facc15' },
-      { l: '中位數', v: f2(st.med), s: st.mean != null && st.med != null ? '平均−中位 ' + (st.mean - st.med >= 0 ? '+' : '') + f2(st.mean - st.med) : '', c: '#ffffff' },
-      { l: '最高估值', v: f2(st.hi), s: st.med ? '高於中位數 ' + pct((st.hi / st.med - 1) * 100, 1) : '', c: '#f87171' },
-      { l: '最低估值', v: f2(st.lo), s: st.med ? '低於中位數 ' + pct((st.lo / st.med - 1) * 100, 1) : '', c: '#4ade80' },
-      { l: '全距', v: f2(st.rg), s: '最高 − 最低', c: '#94a3b8' },
-      { l: '標準差（估）σ̂', v: st.sig != null ? f2(st.sig) : '–', s: '全距 ÷ d2(' + last.n + ') = ' + f2(st.rg) + ' ÷ ' + fmt(d2(last.n), 3), c: '#f97316' },
-      { l: '變異係數 CV', v: st.cv != null ? fmt(st.cv, 2) + '%' : '–', s: 'σ̂ ÷ 平均數', c: '#fb923c' },
-      { l: '偏態指標', v: st.skew != null ? (st.skew >= 0 ? '+' : '') + f2(st.skew) : '–', s: '(平均−中位)÷σ̂', c: '#a78bfa' },
-      { l: '共識σ（實測）', v: ms && ms.sd != null ? f2(ms.sd) : '–', s: ms ? '中位數於 ' + ms.n + ' 次調查間' : '', c: '#38bdf8' }
+      { l: '分析師家數', v: last.n + ' 位', s: (last.approx ? '≈' : '') + last.date, c: '#36536B' },
+      { l: '平均數', v: f2(st.mean), s: fsYear + ' 年EPS（FactSet公布）', c: '#B7791F' },
+      { l: '中位數', v: f2(st.med), s: st.mean != null && st.med != null ? '平均−中位 ' + (st.mean - st.med >= 0 ? '+' : '') + f2(st.mean - st.med) : '', c: '#16324A' },
+      { l: '最高估值', v: f2(st.hi), s: st.med ? '高於中位數 ' + pct((st.hi / st.med - 1) * 100, 1) : '', c: '#E5484D' },
+      { l: '最低估值', v: f2(st.lo), s: st.med ? '低於中位數 ' + pct((st.lo / st.med - 1) * 100, 1) : '', c: '#12A06A' },
+      { l: '全距', v: f2(st.rg), s: '最高 − 最低', c: '#36536B' },
+      { l: '標準差（估）σ̂', v: st.sig != null ? f2(st.sig) : '–', s: '全距 ÷ d2(' + last.n + ') = ' + f2(st.rg) + ' ÷ ' + fmt(d2(last.n), 3), c: '#F5852F' },
+      { l: '變異係數 CV', v: st.cv != null ? fmt(st.cv, 2) + '%' : '–', s: 'σ̂ ÷ 平均數', c: '#F5852F' },
+      { l: '偏態指標', v: st.skew != null ? (st.skew >= 0 ? '+' : '') + f2(st.skew) : '–', s: '(平均−中位)÷σ̂', c: '#7C6BD6' },
+      { l: '共識σ（實測）', v: ms && ms.sd != null ? f2(ms.sd) : '–', s: ms ? '中位數於 ' + ms.n + ' 次調查間' : '', c: '#2A82B8' }
     ];
     $('#fs-cards').innerHTML = cards.map(function (c) {
       return '<div class="sd-card"><div class="l">' + c.l + '</div><div class="v" style="color:' + c.c + '">' + c.v + '</div><div class="s">' + c.s + '</div></div>';
@@ -693,37 +730,37 @@
     /* 圖1：各年度分佈 */
     var stats = ys.map(function (y) { return fsStat(last.years[y], last.n); });
     mk('c-fs-dist', { data: { labels: ys.map(function (y) { return y + ' 年'; }), datasets: [
-      { type: 'bar', label: '最低~最高', data: stats.map(function (s) { return [s.lo, s.hi]; }), backgroundColor: 'rgba(56,189,248,.22)', borderColor: '#38bdf8', borderWidth: 1, barPercentage: 0.5, grouped: false, order: 3 },
-      { type: 'bar', label: '平均 ±1σ̂', data: stats.map(function (s) { return s.sig != null && s.mean != null ? [s.mean - s.sig, s.mean + s.sig] : null; }), backgroundColor: 'rgba(249,115,22,.5)', borderColor: '#f97316', borderWidth: 1, barPercentage: 0.25, grouped: false, order: 2 },
-      { type: 'line', label: '平均數', data: stats.map(function (s) { return s.mean; }), showLine: false, pointStyle: 'rectRot', pointRadius: 7, backgroundColor: '#facc15', borderColor: '#facc15', order: 1 },
-      { type: 'line', label: '中位數', data: stats.map(function (s) { return s.med; }), showLine: false, pointStyle: 'circle', pointRadius: 5, backgroundColor: '#ffffff', borderColor: '#ffffff', order: 0 }
+      { type: 'bar', label: '最低~最高', data: stats.map(function (s) { return [s.lo, s.hi]; }), backgroundColor: 'rgba(56,189,248,.22)', borderColor: '#2A82B8', borderWidth: 1, barPercentage: 0.5, grouped: false, order: 3 },
+      { type: 'bar', label: '平均 ±1σ̂', data: stats.map(function (s) { return s.sig != null && s.mean != null ? [s.mean - s.sig, s.mean + s.sig] : null; }), backgroundColor: 'rgba(249,115,22,.5)', borderColor: '#F5852F', borderWidth: 1, barPercentage: 0.25, grouped: false, order: 2 },
+      { type: 'line', label: '平均數', data: stats.map(function (s) { return s.mean; }), showLine: false, pointStyle: 'rectRot', pointRadius: 7, backgroundColor: '#B7791F', borderColor: '#B7791F', order: 1 },
+      { type: 'line', label: '中位數', data: stats.map(function (s) { return s.med; }), showLine: false, pointStyle: 'circle', pointRadius: 5, backgroundColor: '#16324A', borderColor: '#16324A', order: 0 }
     ] }, options: baseOpts(fsY()) });
 
     /* 圖2：共識隨調查時間 */
     function col(k) { return sv.map(function (s) { var y = s.years[fsYear]; return y && y[k] != null ? y[k] : null; }); }
     mk('c-fs-time', { type: 'line', data: { labels: sv.map(function (s) { return [(s.approx ? '≈' : '') + s.date.slice(5), 'n=' + s.n]; }), datasets: [
-      { label: '最高', data: col('hi'), borderColor: '#f87171', borderDash: [5, 4], borderWidth: 1.5, pointRadius: 2, tension: 0.2, spanGaps: true },
-      { label: '平均數', data: col('mean'), borderColor: '#facc15', borderWidth: 2, pointRadius: 3, tension: 0.2, spanGaps: true },
-      { label: '中位數', data: col('med'), borderColor: '#ffffff', borderWidth: 2.5, pointRadius: 3, tension: 0.2, spanGaps: true },
-      { label: '最低', data: col('lo'), borderColor: '#4ade80', borderDash: [5, 4], borderWidth: 1.5, pointRadius: 2, tension: 0.2, spanGaps: true }
+      { label: '最高', data: col('hi'), borderColor: '#E5484D', borderDash: [5, 4], borderWidth: 1.5, pointRadius: 2, tension: 0.2, spanGaps: true },
+      { label: '平均數', data: col('mean'), borderColor: '#B7791F', borderWidth: 2, pointRadius: 3, tension: 0.2, spanGaps: true },
+      { label: '中位數', data: col('med'), borderColor: '#16324A', borderWidth: 2.5, pointRadius: 3, tension: 0.2, spanGaps: true },
+      { label: '最低', data: col('lo'), borderColor: '#12A06A', borderDash: [5, 4], borderWidth: 1.5, pointRadius: 2, tension: 0.2, spanGaps: true }
     ] }, options: baseOpts(fsY()) });
 
     /* 圖3：目標價 */
     var tps = sv.map(function (s) { return { date: s.date, approx: s.approx, med: s.tp }; }).concat(d.tp || []);
     tps.sort(function (a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : 0; });
     mk('c-fs-tp', { type: 'line', data: { labels: tps.map(function (t) { return (t.approx ? '≈' : '') + t.date.slice(5); }), datasets: [
-      { label: '目標價中位數', data: tps.map(function (t) { return t.med; }), borderColor: '#ffffff', borderWidth: 2.5, pointRadius: 3, tension: 0.2, spanGaps: true },
-      { label: '最高估值', data: tps.map(function (t) { return t.hi != null ? t.hi : null; }), borderColor: '#f87171', borderDash: [5, 4], borderWidth: 1.5, pointRadius: 4, spanGaps: true },
-      { label: '最低估值', data: tps.map(function (t) { return t.lo != null ? t.lo : null; }), borderColor: '#4ade80', borderDash: [5, 4], borderWidth: 1.5, pointRadius: 4, spanGaps: true },
-      { label: '現價 ' + fmt(px, 1) + '（' + pxDate + '）', data: tps.map(function () { return px; }), borderColor: '#38bdf8', borderWidth: 1.5, pointRadius: 0 }
+      { label: '目標價中位數', data: tps.map(function (t) { return t.med; }), borderColor: '#16324A', borderWidth: 2.5, pointRadius: 3, tension: 0.2, spanGaps: true },
+      { label: '最高估值', data: tps.map(function (t) { return t.hi != null ? t.hi : null; }), borderColor: '#E5484D', borderDash: [5, 4], borderWidth: 1.5, pointRadius: 4, spanGaps: true },
+      { label: '最低估值', data: tps.map(function (t) { return t.lo != null ? t.lo : null; }), borderColor: '#12A06A', borderDash: [5, 4], borderWidth: 1.5, pointRadius: 4, spanGaps: true },
+      { label: '現價 ' + fmt(px, 1) + '（' + pxDate + '）', data: tps.map(function () { return px; }), borderColor: '#2A82B8', borderWidth: 1.5, pointRadius: 0 }
     ] }, options: baseOpts(fsY()) });
 
     /* 圖4：評級 */
     var rt = d.rating;
     if (rt) {
       mk('c-fs-rate', { type: 'doughnut', data: { labels: ['積極樂觀 ' + rt.bull + ' 位', '保持中立 ' + rt.neutral + ' 位', '保守悲觀 ' + rt.bear + ' 位'],
-        datasets: [{ data: [rt.bull, rt.neutral, rt.bear], backgroundColor: ['#22c55e', '#eab308', '#ef4444'], borderColor: '#0a0f1e', borderWidth: 2 }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: '#94a3b8', font: { size: 11 } } } } } });
+        datasets: [{ data: [rt.bull, rt.neutral, rt.bear], backgroundColor: ['#12A06A', '#C99700', '#E5484D'], borderColor: '#FFFFFF', borderWidth: 2 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: '#36536B', font: { size: 11 } } } } } });
     } else if (charts['c-fs-rate']) { charts['c-fs-rate'].destroy(); delete charts['c-fs-rate']; }
 
     /* 表格 */
@@ -868,8 +905,8 @@
   $('#sd-token').addEventListener('change', function () { token = this.value.trim(); });
 
   if (typeof Chart !== 'undefined') {
-    Chart.defaults.color = '#94a3b8';
-    Chart.defaults.borderColor = '#1e293b';
+    Chart.defaults.color = '#36536B';
+    Chart.defaults.borderColor = '#E1ECF4';
     Chart.defaults.font.family = "'Noto Sans TC','Microsoft JhengHei',system-ui,sans-serif";
   } else {
     status('圖表函式庫（Chart.js）載入失敗，請確認網站允許載入 cdnjs.cloudflare.com 的腳本。', 'err');
